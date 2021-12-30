@@ -16,8 +16,11 @@ import lombok.NoArgsConstructor;
 public class Operation implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idoperation", nullable = false)
     private String idoperation;
     private String dateHeure;
+    private String libelle;
     private Double montant;
     private Double tauxapplique;
     private String categorie;
@@ -25,8 +28,7 @@ public class Operation implements Serializable {
 
     @JoinColumn(name = "idcompte", insertable = false, updatable = false)
     @ManyToOne(targetEntity = Compte.class, fetch = FetchType.EAGER)
-    private Compte comptecrediteur;
+    private Compte compte;
 
-    @Column(name = "idcompte")
-    private String idcompte;
+
 }

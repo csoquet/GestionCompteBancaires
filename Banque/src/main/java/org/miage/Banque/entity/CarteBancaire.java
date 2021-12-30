@@ -1,6 +1,7 @@
 package org.miage.Banque.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -16,6 +17,8 @@ public class CarteBancaire implements Serializable{
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idcarte", nullable = false)
     private String idcarte;
     private String numcarte;
     private String code;
@@ -26,12 +29,10 @@ public class CarteBancaire implements Serializable{
     private Boolean sanscontact;
     private Boolean virtuelle;
 
-    @JoinColumn(name = "idoperation", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Operation.class, fetch = FetchType.EAGER)
-    private Operation operation;
+    @JoinColumn(name = "idclient", insertable = false, updatable = false)
+    @ManyToOne(targetEntity = Client.class, fetch = FetchType.EAGER)
+    private Client client;
 
-    @Column(name = "idoperation")
-    private String idoperation;
 
 
 }
