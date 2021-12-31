@@ -7,8 +7,10 @@ import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.miage.Banque.entity.Compte;
 
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -29,4 +31,5 @@ public class ClientInput {
     @Size(min = 10, max = 10)
     @Pattern(regexp = "[0-9]+")
     private String numtel;
+    private Set<Compte> comptes;
 }

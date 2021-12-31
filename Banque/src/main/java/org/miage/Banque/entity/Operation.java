@@ -1,6 +1,7 @@
 package org.miage.Banque.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.*;
 
@@ -19,7 +20,7 @@ public class Operation implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idoperation", nullable = false)
     private String idoperation;
-    private String dateHeure;
+    private Date dateHeure;
     private String libelle;
     private Double montant;
     private Double tauxapplique;

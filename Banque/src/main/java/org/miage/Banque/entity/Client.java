@@ -29,8 +29,9 @@ public class Client implements Serializable {
     private String numtel;
 
     @OneToMany
-    @JoinColumn(name="idcompte")
+    @JoinColumn(name="idcompte", insertable = false, updatable = false)
     private Set<Compte> comptes;
+
 
 
 

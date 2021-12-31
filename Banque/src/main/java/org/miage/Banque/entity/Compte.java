@@ -19,12 +19,9 @@ public class Compte implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idcompte", nullable = false)
     private String idcompte;
-    private String IBAN;
+    private String iban;
     private Double solde;
 
-    @JoinColumn(name = "idclient", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Client.class, fetch = FetchType.EAGER)
-    private Client client;
 
     @OneToMany
     @JoinColumn(name="idoperation")
