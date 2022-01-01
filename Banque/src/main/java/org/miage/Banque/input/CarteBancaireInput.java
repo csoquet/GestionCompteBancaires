@@ -3,7 +3,7 @@ package org.miage.Banque.input;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.miage.Banque.entity.Client;
+import org.miage.Banque.entity.Compte;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -28,5 +28,5 @@ public class CarteBancaireInput {
     private Boolean sanscontact;
     private Boolean virtuelle;
 
-    private Client client;
+    private Compte compte;
 }

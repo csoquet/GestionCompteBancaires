@@ -28,7 +28,7 @@ public class CarteBancaire implements Serializable{
     private Boolean virtuelle;
 
     @JoinColumn(name = "idcompte", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Compte.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Compte.class)
     private Compte compte;
 
 

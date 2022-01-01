@@ -26,9 +26,14 @@ public class Client implements Serializable {
     private String nopasseport;
     private String numtel;
 
-    @OneToOne
-    @JoinColumn(name="idcompte", insertable = false, updatable = false)
+    @JoinColumn(name = "idcompte", referencedColumnName = "idcompte")
+    @OneToOne(targetEntity = Compte.class, cascade = CascadeType.ALL)
     private Compte compte;
+
+    //@OneToOne(cascade = CascadeType.ALL)
+    //    @JoinColumn(name = "compte_id", referencedColumnName = "id")
+    //    @JsonManagedReference
+    //    private Compte compte;
 
 
 

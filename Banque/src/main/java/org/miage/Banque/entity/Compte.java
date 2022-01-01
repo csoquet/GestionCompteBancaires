@@ -22,16 +22,15 @@ public class Compte implements Serializable {
     private String iban;
     private Double solde;
 
-    @JoinColumn(name = "idclient", insertable = false, updatable = false)
-    @OneToOne(targetEntity = Client.class, fetch = FetchType.EAGER)
+    @OneToOne(targetEntity = Client.class)
     private Client client;
 
+    //@OneToOne(mappedBy = "compte",cascade = CascadeType.ALL)
+    //    private Client client;
 
-    @OneToMany
-    @JoinColumn(name="idoperation")
+    @OneToMany(mappedBy = "compte")
     private Set<Operation> operation;
 
-    @OneToMany
-    @JoinColumn(name="idcarte")
+    @OneToMany(mappedBy = "compte")
     private Set<CarteBancaire> cartes;
 }

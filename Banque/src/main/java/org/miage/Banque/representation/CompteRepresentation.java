@@ -38,6 +38,7 @@ public class CompteRepresentation {
 
     @GetMapping
     public ResponseEntity<?> getAllComptes() {
+
         return ResponseEntity.ok(ca.toCollectionModel(cr.findAll()));
     }
 
