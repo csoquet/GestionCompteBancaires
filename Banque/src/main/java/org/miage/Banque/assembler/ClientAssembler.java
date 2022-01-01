@@ -8,6 +8,7 @@ import java.util.stream.StreamSupport;
 
 import org.miage.Banque.entity.Client;
 import org.miage.Banque.representation.ClientRepresentation;
+import org.miage.Banque.representation.CompteRepresentation;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -22,7 +23,10 @@ public class ClientAssembler implements RepresentationModelAssembler<Client, Ent
                 linkTo(methodOn(ClientRepresentation.class)
                         .getOneClient(client.getIdclient())).withSelfRel(),
                 linkTo(methodOn(ClientRepresentation.class)
-                        .getAllClients()).withRel("collection"));
+                        .getAllClients()).withRel("collection"),
+                linkTo(methodOn(CompteRepresentation.class)
+                        .getOneCompte(client.getCompte().getIdcompte())).withSelfRel());
+
     }
 
     public CollectionModel<EntityModel<Client>> toCollectionModel(Iterable<? extends Client> entities) {

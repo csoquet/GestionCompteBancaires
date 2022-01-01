@@ -1,6 +1,5 @@
 package org.miage.Banque.validator;
 
-import org.miage.Banque.input.ClientInput;
 import org.miage.Banque.input.CompteInput;
 import org.springframework.stereotype.Service;
 

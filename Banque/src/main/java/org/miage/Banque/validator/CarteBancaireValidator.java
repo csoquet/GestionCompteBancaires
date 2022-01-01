@@ -1,7 +1,6 @@
 package org.miage.Banque.validator;
 
 import org.miage.Banque.input.CarteBancaireInput;
-import org.miage.Banque.input.OperationInput;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolation;

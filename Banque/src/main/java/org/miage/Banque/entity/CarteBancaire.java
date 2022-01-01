@@ -1,13 +1,11 @@
 package org.miage.Banque.entity;
 
-import java.io.Serializable;
-import java.util.Set;
-
-import javax.persistence.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Data
@@ -29,9 +27,9 @@ public class CarteBancaire implements Serializable{
     private Boolean sanscontact;
     private Boolean virtuelle;
 
-    @JoinColumn(name = "idclient", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Client.class, fetch = FetchType.EAGER)
-    private Client client;
+    @JoinColumn(name = "idcompte", insertable = false, updatable = false)
+    @ManyToOne(targetEntity = Compte.class, fetch = FetchType.EAGER)
+    private Compte compte;
 
 
 

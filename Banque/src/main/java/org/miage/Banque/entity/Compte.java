@@ -22,6 +22,10 @@ public class Compte implements Serializable {
     private String iban;
     private Double solde;
 
+    @JoinColumn(name = "idclient", insertable = false, updatable = false)
+    @OneToOne(targetEntity = Client.class, fetch = FetchType.EAGER)
+    private Client client;
+
 
     @OneToMany
     @JoinColumn(name="idoperation")

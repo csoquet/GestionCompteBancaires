@@ -69,7 +69,7 @@ public class ClientRepresentation {
                 client.getPays(),
                 client.getNopasseport(),
                 client.getNumtel(),
-                client.getComptes()
+                client.getCompte()
         );
         Client saved = cr.save(clientSave);
         URI location = linkTo(ClientRepresentation.class).slash(saved.getIdclient()).toUri();
@@ -121,7 +121,7 @@ public class ClientRepresentation {
                     client.getPays(),
                     client.getNopasseport(),
                     client.getNumtel(),
-                    client.getComptes()));
+                    client.getCompte()));
             client.setIdclient(clientId);
             cr.save(client);
             return ResponseEntity.ok().build();

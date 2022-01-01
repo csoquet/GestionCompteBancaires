@@ -1,1 +1,4 @@
-INSERT INTO client (idclient, nom, prenom, secret, datenaiss, pays, nopasseport, numtel) VALUES ('1', 'Dupont','Bruno', '0000', '1981-02-15', 'France', '0101020203', '0625123621'), ('2', 'Picard','Olivier', '2021', '1992-05-20', 'France', '20322512', '0663963647');
+INSERT INTO compte (iban, solde) VALUES ('202034342', 500.0);
+INSERT INTO client (nom, prenom, secret, datenaiss, pays, nopasseport, numtel, idcompte) VALUES ('Dupont','Bruno', '0000', '15-02-1992', 'France', '0101020203', '0625123621',1), ('Picard','Olivier', '2021', '20-05-1999', 'France', '20322512', '0663963647',1);
+INSERT INTO operation(dateheure, libelle, montant, tauxapplique, categorie, pays, idcompte) VALUES ('2020-02-20 15:00:00','Courses', 20.0, 1.0, 'Magasin', 'France', '1');
+INSERT INTO carte_bancaire(numcarte, code, crypto, bloque, localisation, plafond, sanscontact, virtuelle, idcompte) VALUES ('1234567891234567', '1234', '123', FALSE, FALSE, 1000.0, FALSE, FALSE, 1);

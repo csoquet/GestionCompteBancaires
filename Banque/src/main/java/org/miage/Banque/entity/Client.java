@@ -1,14 +1,12 @@
 package org.miage.Banque.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Set;
-
-import javax.persistence.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Data
@@ -23,14 +21,14 @@ public class Client implements Serializable {
     private String nom;
     private String prenom;
     private String secret;
-    private Date datenaiss;
+    private String datenaiss;
     private String pays;
     private String nopasseport;
     private String numtel;
 
-    @OneToMany
+    @OneToOne
     @JoinColumn(name="idcompte", insertable = false, updatable = false)
-    private Set<Compte> comptes;
+    private Compte compte;
 
 
 
