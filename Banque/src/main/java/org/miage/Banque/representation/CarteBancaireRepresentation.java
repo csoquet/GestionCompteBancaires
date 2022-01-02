@@ -108,34 +108,4 @@ public class CarteBancaireRepresentation {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping(value = "/{cartebancaireId}")
-    @Transactional
-    public ResponseEntity<?> updateCarteBancairePartiel(@PathVariable("cartebancaireId") String cartebancaireId,
-                                                 @RequestBody Map<Object, Object> fields) {
-        Optional<CarteBancaire> body = cbr.findById(cartebancaireId);
-        if (body.isPresent()) {
-            CarteBancaire cb = body.get();
-            fields.forEach((f, v) -> {
-                Field field = ReflectionUtils.findField(CarteBancaire.class, f.toString());
-                field.setAccessible(true);
-                ReflectionUtils.setField(field, cb, v);
-            });
-            cbv.validate(new CarteBancaireInput(
-                    cb.getNumcarte(),
-                    cb.getCode(),
-                    cb.getCrypto(),
-                    cb.getBloque(),
-                    cb.getLocalisation(),
-                    cb.getPlafond(),
-                    cb.getSanscontact(),
-                    cb.getVirtuelle(),
-                    cb.getCompte()
-            ));
-            cb.setIdcarte(cartebancaireId);
-            cbr.save(cb);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
-
 }

@@ -24,9 +24,8 @@ public class ClientAssembler implements RepresentationModelAssembler<Client, Ent
                         .getOneClient(client.getIdclient())).withSelfRel(),
                 linkTo(methodOn(ClientRepresentation.class)
                         .getAllClients()).withRel("collection"),
-                linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(client.getCompte().getIdcompte())).withSelfRel()
-                );
+                linkTo(methodOn(CompteRepresentation.class).getAllComptesByIdClient(client.getIdclient())).withRel("comptes")
+    );
 
     }
 

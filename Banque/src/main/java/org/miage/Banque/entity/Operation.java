@@ -8,6 +8,8 @@ import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Data
@@ -27,8 +29,9 @@ public class Operation implements Serializable {
     private String categorie;
     private String pays;
 
-    @JoinColumn(name = "idcompte", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Compte.class, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idcompte")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Compte compte;
 
 

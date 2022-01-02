@@ -47,12 +47,13 @@ public class ClientRepresentation {
 
     @GetMapping
     public ResponseEntity<?> getAllClients() {
-        return ResponseEntity.ok(ca.toCollectionModel(cr.findAll()));
+        Iterable<Client> clients = cr.findAll();
+        return ResponseEntity.ok(ca.toCollectionModel(clients));
     }
 
     @GetMapping(value = "/{clientId}")
     public ResponseEntity<?> getOneClient(@PathVariable("clientId") String id) {
-        return Optional.ofNullable(cr.findById(id)).filter(Optional::isPresent)
+        return Optional.of(cr.findById(id)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(ca.toModel(i.get())))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -68,8 +69,7 @@ public class ClientRepresentation {
                 client.getDatenaiss(),
                 client.getPays(),
                 client.getNopasseport(),
-                client.getNumtel(),
-                client.getCompte()
+                client.getNumtel()
         );
         Client saved = cr.save(clientSave);
         URI location = linkTo(ClientRepresentation.class).slash(saved.getIdclient()).toUri();
@@ -102,30 +102,4 @@ public class ClientRepresentation {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping(value = "/{clientId}")
-    @Transactional
-    public ResponseEntity<?> updateClientPartiel(@PathVariable("clientId") String clientId,
-                                                      @RequestBody Map<Object, Object> fields) {
-        Optional<Client> body = cr.findById(clientId);
-        if (body.isPresent()) {
-            Client client = body.get();
-            fields.forEach((f, v) -> {
-                Field field = ReflectionUtils.findField(Client.class, f.toString());
-                field.setAccessible(true);
-                ReflectionUtils.setField(field, client, v);
-            });
-            cv.validate(new ClientInput(client.getNom(),
-                    client.getPrenom(),
-                    client.getSecret(),
-                    client.getDatenaiss(),
-                    client.getPays(),
-                    client.getNopasseport(),
-                    client.getNumtel(),
-                    client.getCompte()));
-            client.setIdclient(clientId);
-            cr.save(client);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
 }

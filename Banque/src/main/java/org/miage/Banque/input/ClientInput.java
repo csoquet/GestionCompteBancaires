@@ -30,5 +30,4 @@ public class ClientInput {
     @Size(min = 10, max = 10)
     @Pattern(regexp = "[0-9]+")
     private String numtel;
-    private Compte compte;
 }

@@ -3,6 +3,8 @@ package org.miage.Banque.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -27,8 +29,9 @@ public class CarteBancaire implements Serializable{
     private Boolean sanscontact;
     private Boolean virtuelle;
 
-    @JoinColumn(name = "idcompte", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Compte.class)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idcompte")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Compte compte;
 
 

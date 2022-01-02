@@ -1,15 +1,12 @@
 package org.miage.Banque.input;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
-import org.miage.Banque.entity.CarteBancaire;
 import org.miage.Banque.entity.Client;
-import org.miage.Banque.entity.Operation;
 
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -17,11 +14,8 @@ import java.util.Set;
 public class CompteInput {
 
     @NotNull
-    @UniqueElements
     private String iban;
     private Double solde;
-    @NotNull
+    @JsonIgnore
     private Client client;
-    private Set<Operation> operation;
-    private Set<CarteBancaire> cartes;
 }

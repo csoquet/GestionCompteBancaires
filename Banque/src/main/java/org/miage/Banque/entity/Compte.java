@@ -5,9 +5,13 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Data
@@ -18,19 +22,16 @@ public class Compte implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idcompte", nullable = false)
+    @JsonIgnore
     private String idcompte;
     private String iban;
     private Double solde;
 
-    @OneToOne(targetEntity = Client.class)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idclient")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private Client client;
 
-    //@OneToOne(mappedBy = "compte",cascade = CascadeType.ALL)
-    //    private Client client;
 
-    @OneToMany(mappedBy = "compte")
-    private Set<Operation> operation;
-
-    @OneToMany(mappedBy = "compte")
-    private Set<CarteBancaire> cartes;
 }

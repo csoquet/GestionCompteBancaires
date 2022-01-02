@@ -1,7 +1,14 @@
 package org.miage.Banque.resource;
 
+import org.miage.Banque.entity.Client;
 import org.miage.Banque.entity.Compte;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.util.Optional;
+
+@RepositoryRestResource(collectionResourceRel = "comptes")
 public interface CompteResource extends JpaRepository<Compte, String> {
+
+    Iterable<Compte> findAllByClient(Optional<Client> client);
 }

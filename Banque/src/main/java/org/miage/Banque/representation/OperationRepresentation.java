@@ -93,31 +93,4 @@ public class OperationRepresentation {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping(value = "/{operationId}")
-    @Transactional
-    public ResponseEntity<?> updateOperationPartiel(@PathVariable("operationId") String operationId,
-                                                 @RequestBody Map<Object, Object> fields) {
-        Optional<Operation> body = or.findById(operationId);
-        if (body.isPresent()) {
-            Operation operation = body.get();
-            fields.forEach((f, v) -> {
-                Field field = ReflectionUtils.findField(Operation.class, f.toString());
-                field.setAccessible(true);
-                ReflectionUtils.setField(field, operation, v);
-            });
-            ov.validate(new OperationInput(
-                    operation.getDateheure(),
-                    operation.getLibelle(),
-                    operation.getMontant(),
-                    operation.getTauxapplique(),
-                    operation.getCategorie(),
-                    operation.getPays(),
-                    operation.getCompte()
-            ));
-            operation.setIdoperation(operationId);
-            or.save(operation);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
 }
