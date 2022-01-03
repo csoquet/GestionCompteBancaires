@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.miage.Banque.entity.Compte;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -24,9 +25,10 @@ public class CarteBancaireInput {
     private String crypto;
     private Boolean bloque;
     private Boolean localisation;
+    @NotNull
     private Double plafond;
     private Boolean sanscontact;
     private Boolean virtuelle;
-
+    @NotNull
     private Compte compte;
 }

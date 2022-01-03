@@ -26,7 +26,9 @@ public class CompteAssembler implements RepresentationModelAssembler<Compte, Ent
                 linkTo(methodOn(CompteRepresentation.class)
                         .getOneCompte(compte.getIdcompte())).withSelfRel(),
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getAllComptes()).withRel("collection")
+                        .getAllComptes()).withRel("collection"),
+                linkTo(methodOn(OperationRepresentation.class)
+                        .getAllOperationByIdCompte(compte.getIdcompte())).withRel("operations")
         );
 
     }

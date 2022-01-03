@@ -23,9 +23,11 @@ public class ClientInput {
     private String prenom;
     @Pattern(regexp = "[0-9]+")
     private String secret;
+    @NotNull
     private String datenaiss;
     @Size(min = 3)
     private String pays;
+    @NotNull
     private String nopasseport;
     @Size(min = 10, max = 10)
     @Pattern(regexp = "[0-9]+")

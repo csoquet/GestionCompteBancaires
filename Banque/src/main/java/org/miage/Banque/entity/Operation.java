@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,9 @@ public class Operation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idoperation", nullable = false)
+    @JsonIgnore
     private String idoperation;
+    @JsonIgnore
     private Date dateheure;
     private String libelle;
     private Double montant;
@@ -32,7 +35,14 @@ public class Operation implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idcompte")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private Compte compte;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idcarte")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private CarteBancaire carte;
 
 
 }

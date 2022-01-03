@@ -1,6 +1,7 @@
 package org.miage.Banque.assembler;
 
 import org.miage.Banque.entity.Operation;
+import org.miage.Banque.representation.CarteBancaireRepresentation;
 import org.miage.Banque.representation.CompteRepresentation;
 import org.miage.Banque.representation.OperationRepresentation;
 import org.springframework.hateoas.CollectionModel;
@@ -26,7 +27,9 @@ public class OperationAssembler implements RepresentationModelAssembler<Operatio
                 linkTo(methodOn(OperationRepresentation.class)
                         .getAllOperations()).withRel("collection"),
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(operation.getCompte().getIdcompte())).withSelfRel()
+                        .getOneCompte(operation.getCompte().getIdcompte())).withRel("comptes"),
+                linkTo(methodOn(CarteBancaireRepresentation.class)
+                        .getOneCarteBancaire(operation.getCarte().getIdcarte())).withRel("carte")
         );
     }
 

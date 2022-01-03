@@ -24,6 +24,7 @@ public class Compte implements Serializable {
     @Column(name = "idcompte", nullable = false)
     @JsonIgnore
     private String idcompte;
+    @Column(unique = true)
     private String iban;
     private Double solde;
 

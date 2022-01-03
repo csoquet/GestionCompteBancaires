@@ -1,21 +1,24 @@
 package org.miage.Banque.representation;
 
 import org.miage.Banque.assembler.OperationAssembler;
+import org.miage.Banque.entity.CarteBancaire;
+import org.miage.Banque.entity.Client;
+import org.miage.Banque.entity.Compte;
 import org.miage.Banque.entity.Operation;
 import org.miage.Banque.input.OperationInput;
+import org.miage.Banque.resource.CarteBancaireResource;
+import org.miage.Banque.resource.CompteResource;
 import org.miage.Banque.resource.OperationResource;
 import org.miage.Banque.validator.OperationValidator;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.Map;
+import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,11 +29,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @ExposesResourceFor(Operation.class)
 public class OperationRepresentation {
 
+    private final CompteResource cr;
+    private final CarteBancaireResource carteResource;
     private final OperationResource or;
     private final OperationAssembler oa;
     private final OperationValidator ov;
 
-    public OperationRepresentation(OperationResource or, OperationAssembler oa, OperationValidator ov) {
+    public OperationRepresentation(CompteResource cr, CarteBancaireResource carteResource, OperationResource or, OperationAssembler oa, OperationValidator ov) {
+        this.cr = cr;
+        this.carteResource = carteResource;
         this.or = or;
         this.oa = oa;
         this.ov = ov;
@@ -41,6 +48,13 @@ public class OperationRepresentation {
         return ResponseEntity.ok(oa.toCollectionModel(or.findAll()));
     }
 
+    @GetMapping(value = "/compte/{compteId}")
+    public ResponseEntity<?> getAllOperationByIdCompte(@PathVariable("compteId") String compteId) {
+        Optional<Compte> compte = cr.findById(compteId);
+        Iterable<Operation> operations =  or.findAllByCompte(compte);
+        return ResponseEntity.ok(oa.toCollectionModel(operations));
+    }
+
     @GetMapping(value = "/{operationId}")
     public ResponseEntity<?> getOneOperation(@PathVariable("operationId") String id) {
         return Optional.ofNullable(or.findById(id)).filter(Optional::isPresent)
@@ -48,49 +62,39 @@ public class OperationRepresentation {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping(value = "/{compteId}/{carteId}")
     @Transactional
-    public ResponseEntity<?> saveOperation(@RequestBody @Valid OperationInput operation) {
-        Operation operationSave = new Operation(
+    public ResponseEntity<?> saveOperation(@PathVariable("compteId") String compteId, @PathVariable("carteId") String carteId, @RequestBody @Valid OperationInput operation) {
+
+        Compte compte = cr.findById(compteId).get();
+        CarteBancaire carte = carteResource.findById(carteId).get();
+        if(carte.getBloque()){
+            return ResponseEntity.internalServerError().build();
+        }
+
+        Operation operationSave;
+        Double montant = operation.getMontant();
+        if(!compte.getClient().getPays().equals(operation.getPays())) { //Si le paiement n'a pas lieu dans le même pays que le compte
+            montant = operation.getMontant() *  operation.getTauxapplique();
+        }
+
+        compte.setSolde(compte.getSolde() + montant);
+        operationSave = new Operation(
                 UUID.randomUUID().toString(),
-                operation.getDateheure(),
+                new Timestamp(System.currentTimeMillis()),
                 operation.getLibelle(),
-                operation.getMontant(),
+                montant,
                 operation.getTauxapplique(),
                 operation.getCategorie(),
                 operation.getPays(),
-                operation.getCompte()
+                compte,
+                carte
 
         );
+
         Operation saved = or.save(operationSave);
         URI location = linkTo(OperationRepresentation.class).slash(saved.getIdoperation()).toUri();
         return ResponseEntity.created(location).build();
-    }
-
-    @DeleteMapping(value = "/{operationId}")
-    @Transactional
-    public ResponseEntity<?> deleteOperation(@PathVariable("operationId") String operationId) {
-        Optional<Operation> operation = or.findById(operationId);
-        if (operation.isPresent()) {
-            or.delete(operation.get());
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping(value = "/{operationId}")
-    @Transactional
-    public ResponseEntity<?> updateOperation(@RequestBody Operation operation,
-                                          @PathVariable("operationId") String operationId) {
-        Optional<Operation> body = Optional.ofNullable(operation);
-        if (!body.isPresent()) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (!or.existsById(operationId)) {
-            return ResponseEntity.notFound().build();
-        }
-        operation.setIdoperation(operationId);
-        or.save(operation);
-        return ResponseEntity.ok().build();
     }
 
 }

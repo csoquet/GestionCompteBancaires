@@ -1,5 +1,6 @@
 package org.miage.Banque.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,9 @@ public class CarteBancaire implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idcarte", nullable = false)
+    @JsonIgnore
     private String idcarte;
+    @Column(unique = true)
     private String numcarte;
     private String code;
     private String crypto;

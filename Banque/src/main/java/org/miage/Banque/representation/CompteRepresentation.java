@@ -45,9 +45,9 @@ public class CompteRepresentation {
         return ResponseEntity.ok(ca.toCollectionModel(cr.findAll()));
     }
 
-    @GetMapping(value = "/client/{idclient}")
-    public ResponseEntity<?> getAllComptesByIdClient(@PathVariable("idclient") String idclient) {
-        Optional<Client> client = clientResource.findById(idclient);
+    @GetMapping(value = "/client/{clientId}")
+    public ResponseEntity<?> getAllComptesByIdClient(@PathVariable("clientId") String clientId) {
+        Optional<Client> client = clientResource.findById(clientId);
         Iterable<Compte> comptes =  cr.findAllByClient(client);
         return ResponseEntity.ok(ca.toCollectionModel(comptes));
     }
@@ -59,11 +59,11 @@ public class CompteRepresentation {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/{idclient}")
+    @PostMapping(value = "/{clientId}")
     @Transactional
-    public ResponseEntity<?> saveCompte(@PathVariable("idclient") String idclient, @RequestBody @Valid CompteInput compte) {
+    public ResponseEntity<?> saveCompte(@PathVariable("clientId") String clientId, @RequestBody @Valid CompteInput compte) {
 
-        Optional<Client> client = clientResource.findById(idclient);
+        Optional<Client> client = clientResource.findById(clientId);
 
         Compte compteSave = new Compte(
                 UUID.randomUUID().toString(),
@@ -86,12 +86,10 @@ public class CompteRepresentation {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/{compteId}/{idclient}")
+    @PutMapping(value = "/{compteId}")
     @Transactional
     public ResponseEntity<?> updateCompte(@RequestBody Compte compte,
-                                          @PathVariable("compteId") String compteId,
-                                          @PathVariable("idclient") String idclient) {
-        Optional<Client> client = clientResource.findById(idclient);
+                                          @PathVariable("compteId") String compteId) {
         Optional<Compte> body = Optional.ofNullable(compte);
         if (!body.isPresent()) {
             return ResponseEntity.badRequest().build();
@@ -99,7 +97,6 @@ public class CompteRepresentation {
         if (!cr.existsById(compteId)) {
             return ResponseEntity.notFound().build();
         }
-        compte.setClient(client.get());
         compte.setIdcompte(compteId);
         cr.save(compte);
         return ResponseEntity.ok().build();

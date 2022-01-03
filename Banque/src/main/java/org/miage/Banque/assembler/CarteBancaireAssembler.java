@@ -27,7 +27,8 @@ public class CarteBancaireAssembler implements RepresentationModelAssembler<Cart
                 linkTo(methodOn(CarteBancaireRepresentation.class)
                         .getAllCarteBancaire()).withRel("collection"),
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(cartebancaire.getCompte().getIdcompte())).withSelfRel());
+                        .getOneCompte(cartebancaire.getCompte().getIdcompte())).withRel("comptes")
+        );
     }
 
     public CollectionModel<EntityModel<CarteBancaire>> toCollectionModel(Iterable<? extends CarteBancaire> entities) {

@@ -23,6 +23,7 @@ public class Client implements Serializable {
     private String secret;
     private String datenaiss;
     private String pays;
+    @Column(unique = true)
     private String nopasseport;
     private String numtel;
 
