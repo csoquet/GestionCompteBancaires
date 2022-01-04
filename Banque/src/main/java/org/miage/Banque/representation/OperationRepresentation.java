@@ -48,10 +48,17 @@ public class OperationRepresentation {
         return ResponseEntity.ok(oa.toCollectionModel(or.findAll()));
     }
 
-    @GetMapping(value = "/compte/{compteId}")
-    public ResponseEntity<?> getAllOperationByIdCompte(@PathVariable("compteId") String compteId) {
+    @GetMapping(value = "/compte/debit/{compteId}")
+    public ResponseEntity<?> getAllOperationDebitByIdCompte(@PathVariable("compteId") String compteId) {
         Optional<Compte> compte = cr.findById(compteId);
         Iterable<Operation> operations =  or.findAllByComptedebiteur(compte);
+        return ResponseEntity.ok(oa.toCollectionModel(operations));
+    }
+
+    @GetMapping(value = "/compte/credit/{compteId}")
+    public ResponseEntity<?> getAllOperationCreditByIdCompte(@PathVariable("compteId") String compteId) {
+        Optional<Compte> compte = cr.findById(compteId);
+        Iterable<Operation> operations =  or.findAllByComptecrediteur(compte);
         return ResponseEntity.ok(oa.toCollectionModel(operations));
     }
 
@@ -62,15 +69,18 @@ public class OperationRepresentation {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/{comptedebiteurId}/{comptecrediteurId}/{carteId}")
+    @PostMapping(value = "/{comptedebiteurIban}/{comptecrediteurIban}/{carteNumero}")
     @Transactional
-    public ResponseEntity<?> saveOperation(@PathVariable("comptedebiteurId") String comptedebiteurId, @PathVariable("comptecrediteurId") String comptecrediteurId , @PathVariable("carteId") String carteId, @RequestBody @Valid OperationInput operation) {
+    public ResponseEntity<?> saveOperation(@PathVariable("comptedebiteurIban") String comptedebiteurIban, @PathVariable("comptecrediteurIban") String comptecrediteurIban , @PathVariable("carteNumero") String carteNumero, @RequestBody @Valid OperationInput operation) {
 
-        Compte comptedebiteur = cr.findById(comptedebiteurId).get();
-        Compte comptecrediteur = cr.findById(comptecrediteurId).get();
-        CarteBancaire carte = carteResource.findById(carteId).get();
+        Compte comptedebiteur = cr.findByIban(comptedebiteurIban);
+        Compte comptecrediteur = cr.findByIban(comptecrediteurIban);
+        CarteBancaire carte = carteResource.findByNumcarte(carteNumero);
         if(carte.getBloque()){
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.badRequest().build();
+        }
+        if(carte.getVirtuelle()){
+
         }
 
         Operation operationSave;

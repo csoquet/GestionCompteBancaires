@@ -88,6 +88,7 @@ public class CompteRepresentation {
     @Transactional
     public ResponseEntity<?> deleteCompte(@PathVariable("compteId") String compteId) {
         Optional<Compte> compte = cr.findById(compteId);
+        compte.get().setClient(null);
         if (compte.isPresent()) {
             cr.delete(compte.get());
         }

@@ -29,7 +29,9 @@ public class CompteAssembler implements RepresentationModelAssembler<Compte, Ent
                 linkTo(methodOn(CompteRepresentation.class)
                         .getAllComptes()).withRel("collection"),
                 linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperationByIdCompte(compte.getIdcompte())).withRel("operations"),
+                        .getAllOperationDebitByIdCompte(compte.getIdcompte())).withRel("operations"),
+                linkTo(methodOn(OperationRepresentation.class)
+                        .getAllOperationCreditByIdCompte(compte.getIdcompte())).withRel("operations"),
                 linkTo(methodOn(CarteBancaireRepresentation.class)
                         .getAllCarteByIdCompte(compte.getIdcompte())).withRel("cartes")
         );

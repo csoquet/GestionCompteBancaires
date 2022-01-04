@@ -103,6 +103,7 @@ public class CarteBancaireRepresentation {
     @Transactional
     public ResponseEntity<?> deleteCarteBancaire(@PathVariable("cartebancaireId") String cartebancaireId) {
         Optional<CarteBancaire> cb = cbr.findById(cartebancaireId);
+        cb.get().setCompte(null);
         if (cb.isPresent()) {
             cbr.delete(cb.get());
         }

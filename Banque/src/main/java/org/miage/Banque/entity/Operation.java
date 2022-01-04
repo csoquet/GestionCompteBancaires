@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -34,20 +35,20 @@ public class Operation implements Serializable {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idcomptecrediteur")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Compte comptedebiteur;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idcomptedebiteur")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Compte comptecrediteur;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idcarte")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private CarteBancaire carte;
 
 
