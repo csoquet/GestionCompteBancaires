@@ -35,6 +35,7 @@ public class CarteBancaire implements Serializable{
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idcompte")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private Compte compte;
 
 

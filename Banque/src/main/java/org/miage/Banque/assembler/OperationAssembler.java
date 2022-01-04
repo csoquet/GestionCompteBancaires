@@ -27,7 +27,7 @@ public class OperationAssembler implements RepresentationModelAssembler<Operatio
                 linkTo(methodOn(OperationRepresentation.class)
                         .getAllOperations()).withRel("collection"),
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(operation.getCompte().getIdcompte())).withRel("comptes"),
+                        .getOneCompte(operation.getComptedebiteur().getIdcompte())).withRel("comptes"),
                 linkTo(methodOn(CarteBancaireRepresentation.class)
                         .getOneCarteBancaire(operation.getCarte().getIdcarte())).withRel("carte")
         );

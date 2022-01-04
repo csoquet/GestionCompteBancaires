@@ -2,6 +2,7 @@ package org.miage.Banque.assembler;
 
 import org.miage.Banque.entity.Compte;
 import org.miage.Banque.entity.Operation;
+import org.miage.Banque.representation.CarteBancaireRepresentation;
 import org.miage.Banque.representation.ClientRepresentation;
 import org.miage.Banque.representation.CompteRepresentation;
 import org.miage.Banque.representation.OperationRepresentation;
@@ -28,7 +29,9 @@ public class CompteAssembler implements RepresentationModelAssembler<Compte, Ent
                 linkTo(methodOn(CompteRepresentation.class)
                         .getAllComptes()).withRel("collection"),
                 linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperationByIdCompte(compte.getIdcompte())).withRel("operations")
+                        .getAllOperationByIdCompte(compte.getIdcompte())).withRel("operations"),
+                linkTo(methodOn(CarteBancaireRepresentation.class)
+                        .getAllCarteByIdCompte(compte.getIdcompte())).withRel("cartes")
         );
 
     }

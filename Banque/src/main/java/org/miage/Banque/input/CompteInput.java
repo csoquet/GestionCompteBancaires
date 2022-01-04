@@ -15,10 +15,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class CompteInput {
 
-    @NotNull
-    @Size(min = 14, max = 34)
-    @Pattern(regexp = "[A-Z]{2}[0-9]+")
-    private String iban;
+
     @NotNull
     private Double solde;
     @JsonIgnore

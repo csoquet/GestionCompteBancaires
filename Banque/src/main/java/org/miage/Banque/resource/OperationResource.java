@@ -11,5 +11,5 @@ import java.util.Optional;
 @RepositoryRestResource(collectionResourceRel = "operations")
 public interface OperationResource extends JpaRepository<Operation, String> {
 
-    Iterable<Operation> findAllByCompte(Optional<Compte> compte);
+    Iterable<Operation> findAllByComptedebiteur(Optional<Compte> compte);
 }

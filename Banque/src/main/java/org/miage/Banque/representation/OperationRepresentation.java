@@ -51,7 +51,7 @@ public class OperationRepresentation {
     @GetMapping(value = "/compte/{compteId}")
     public ResponseEntity<?> getAllOperationByIdCompte(@PathVariable("compteId") String compteId) {
         Optional<Compte> compte = cr.findById(compteId);
-        Iterable<Operation> operations =  or.findAllByCompte(compte);
+        Iterable<Operation> operations =  or.findAllByComptedebiteur(compte);
         return ResponseEntity.ok(oa.toCollectionModel(operations));
     }
 
@@ -62,11 +62,12 @@ public class OperationRepresentation {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/{compteId}/{carteId}")
+    @PostMapping(value = "/{comptedebiteurId}/{comptecrediteurId}/{carteId}")
     @Transactional
-    public ResponseEntity<?> saveOperation(@PathVariable("compteId") String compteId, @PathVariable("carteId") String carteId, @RequestBody @Valid OperationInput operation) {
+    public ResponseEntity<?> saveOperation(@PathVariable("comptedebiteurId") String comptedebiteurId, @PathVariable("comptecrediteurId") String comptecrediteurId , @PathVariable("carteId") String carteId, @RequestBody @Valid OperationInput operation) {
 
-        Compte compte = cr.findById(compteId).get();
+        Compte comptedebiteur = cr.findById(comptedebiteurId).get();
+        Compte comptecrediteur = cr.findById(comptecrediteurId).get();
         CarteBancaire carte = carteResource.findById(carteId).get();
         if(carte.getBloque()){
             return ResponseEntity.internalServerError().build();
@@ -74,11 +75,11 @@ public class OperationRepresentation {
 
         Operation operationSave;
         Double montant = operation.getMontant();
-        if(!compte.getClient().getPays().equals(operation.getPays())) { //Si le paiement n'a pas lieu dans le même pays que le compte
+        if(!comptedebiteur.getClient().getPays().equals(operation.getPays())) { //Si le paiement n'a pas lieu dans le même pays que le compte
             montant = operation.getMontant() *  operation.getTauxapplique();
         }
-
-        compte.setSolde(compte.getSolde() + montant);
+        comptedebiteur.setSolde(comptedebiteur.getSolde() - montant);
+        comptecrediteur.setSolde(comptecrediteur.getSolde() + montant);
         operationSave = new Operation(
                 UUID.randomUUID().toString(),
                 new Timestamp(System.currentTimeMillis()),
@@ -87,9 +88,9 @@ public class OperationRepresentation {
                 operation.getTauxapplique(),
                 operation.getCategorie(),
                 operation.getPays(),
-                compte,
+                comptedebiteur,
+                comptecrediteur,
                 carte
-
         );
 
         Operation saved = or.save(operationSave);

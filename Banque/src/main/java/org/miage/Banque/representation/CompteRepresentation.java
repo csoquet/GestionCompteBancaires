@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -64,10 +65,17 @@ public class CompteRepresentation {
     public ResponseEntity<?> saveCompte(@PathVariable("clientId") String clientId, @RequestBody @Valid CompteInput compte) {
 
         Optional<Client> client = clientResource.findById(clientId);
-
+        String lettre = client.get().getPays().substring(0,2).toUpperCase(); //2 premiere lettre du pays
+        String iban = lettre;
+        int Min = 1;
+        int Max = 9;
+        for(int i = 1; i <= 25; i++){//Générer des chiffres de l'iban
+            int nombreAleatoire = Min + (int)(Math.random() * (Max - Min) + 1);
+            iban += nombreAleatoire;
+        }
         Compte compteSave = new Compte(
                 UUID.randomUUID().toString(),
-                compte.getIban(),
+                iban,
                 compte.getSolde(),
                 client.get()
         );

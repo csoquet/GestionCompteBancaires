@@ -31,7 +31,9 @@ public class OperationInput {
     @Size(min = 2)
     private String pays;
     @JsonIgnore
-    private Compte compte;
+    private Compte comptedebiteur;
+    @JsonIgnore
+    private Compte comptecrediteur;
     @JsonIgnore
     private CarteBancaire carte;
 }

@@ -1,5 +1,6 @@
 package org.miage.Banque.input;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import org.miage.Banque.entity.Compte;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Data
@@ -14,21 +16,13 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class CarteBancaireInput {
 
-    @Size(min = 16, max = 16)
-    @Pattern(regexp = "[0-9]+")
-    private String numcarte;
-    @Size(min = 4, max = 4)
-    @Pattern(regexp = "[0-9]+")
-    private String code;
-    @Size(min = 3, max = 3)
-    @Pattern(regexp = "[0-9]+")
-    private String crypto;
     private Boolean bloque;
     private Boolean localisation;
     @NotNull
+    @Positive
     private Double plafond;
     private Boolean sanscontact;
     private Boolean virtuelle;
-    @NotNull
+    @JsonIgnore
     private Compte compte;
 }
