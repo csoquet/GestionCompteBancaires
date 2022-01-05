@@ -67,11 +67,11 @@ public class OperationRepresentation {
         Compte comptedebiteur = cr.findByIban(compteIban);
         Compte comptecrediteur = cr.findByIban(operation.getComptecrediteurIban());
         CarteBancaire carte = carteResource.findByNumcarte(operation.getCarteNumero());
-        if(carte.getBloque() || carte.getSupprimer()){
+        if(carte.getBloque() || carte.getSupprimer()){ //Si la carte est bloquée ou supprimer alors on ne peut pas l'utiliser
             return ResponseEntity.badRequest().build();
         }
-        if(carte.getVirtuelle()){
-
+        if(carte.getVirtuelle()){ //Si c'est une carte virtuelle alors elle est supprimer après l'utilisation
+            carte.setSupprimer(true);
         }
 
         Operation operationSave;
