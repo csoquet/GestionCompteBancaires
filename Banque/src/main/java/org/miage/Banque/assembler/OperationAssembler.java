@@ -19,19 +19,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class OperationAssembler implements RepresentationModelAssembler<Operation, EntityModel<Operation>> {
 
+
     @Override
     public EntityModel<Operation> toModel(Operation operation) {
+
+        String clientId = operation.getComptedebiteur().getClient().getIdclient();
+        String compteId = operation.getComptedebiteur().getIban();
+
         return EntityModel.of(operation,
                 linkTo(methodOn(OperationRepresentation.class)
-                        .getOneOperation(operation.getIdoperation())).withSelfRel(),
+                        .getOneOperation(clientId, compteId, operation.getIdoperation())).withSelfRel(),
                 linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperations()).withRel("collection"),
+                        .getAllOperationByIdCompte(clientId, compteId)).withRel("collection"),
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(operation.getComptedebiteur().getIdcompte())).withRel("comptes"),
-                linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(operation.getComptecrediteur().getIdcompte())).withRel("comptes"),
+                        .getOneCompte(clientId, compteId)).withRel("comptes"),
                 linkTo(methodOn(CarteBancaireRepresentation.class)
-                        .getOneCarteBancaire(operation.getCarte().getIdcarte())).withRel("carte")
+                        .getOneCarteBancaire(clientId, compteId, operation.getCarte().getNumcarte())).withRel("carte")
         );
     }
 
@@ -40,8 +43,10 @@ public class OperationAssembler implements RepresentationModelAssembler<Operatio
                 .stream(entities.spliterator(), false)
                 .map(i -> toModel(i))
                 .collect(Collectors.toList());
+        String clientId = operationModel.get(0).getContent().getComptedebiteur().getClient().getIdclient();
+        String compteId = operationModel.get(0).getContent().getComptedebiteur().getIban();
         return CollectionModel.of(operationModel,
                 linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperations()).withSelfRel());
+                        .getAllOperationByIdCompte(clientId, compteId)).withSelfRel());
     }
 }

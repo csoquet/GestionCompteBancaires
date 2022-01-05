@@ -5,28 +5,16 @@ import org.miage.Banque.entity.Client;
 import org.miage.Banque.input.ClientInput;
 import org.miage.Banque.resource.ClientResource;
 import org.miage.Banque.validator.ClientValidator;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-
+import java.net.URI;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 

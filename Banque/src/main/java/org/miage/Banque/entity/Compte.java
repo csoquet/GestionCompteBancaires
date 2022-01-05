@@ -20,11 +20,8 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Compte implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idcompte", nullable = false)
+    @Column(name = "iban", nullable = false)
     @JsonIgnore
-    private String idcompte;
-    @Column(unique = true)
     private String iban;
     private Double solde;
 

@@ -1,33 +1,34 @@
 package org.miage.Banque.assembler;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import org.miage.Banque.entity.CarteBancaire;
-import org.miage.Banque.entity.Client;
 import org.miage.Banque.representation.CarteBancaireRepresentation;
-import org.miage.Banque.representation.ClientRepresentation;
 import org.miage.Banque.representation.CompteRepresentation;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Component
 public class CarteBancaireAssembler implements RepresentationModelAssembler<CarteBancaire, EntityModel<CarteBancaire>>{
 
     @Override
     public EntityModel<CarteBancaire> toModel(CarteBancaire cartebancaire) {
+        String clientId = cartebancaire.getCompte().getClient().getIdclient();
+        String compteId = cartebancaire.getCompte().getIban();
         return EntityModel.of(cartebancaire,
                 linkTo(methodOn(CarteBancaireRepresentation.class)
-                        .getOneCarteBancaire(cartebancaire.getIdcarte())).withSelfRel(),
+                        .getOneCarteBancaire(clientId, compteId, cartebancaire.getNumcarte())).withSelfRel(),
                 linkTo(methodOn(CarteBancaireRepresentation.class)
-                        .getAllCarteBancaire()).withRel("collection"),
+                        .getAllCarteByIdCompte(clientId, compteId)).withRel("collection"),
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(cartebancaire.getCompte().getIdcompte())).withRel("comptes")
+                        .getOneCompte(clientId, compteId)).withRel("comptes")
         );
     }
 
@@ -36,8 +37,10 @@ public class CarteBancaireAssembler implements RepresentationModelAssembler<Cart
                 .stream(entities.spliterator(), false)
                 .map(i -> toModel(i))
                 .collect(Collectors.toList());
+        String clientId = cartebancaireModel.get(0).getContent().getCompte().getClient().getIdclient();
+        String compteId = cartebancaireModel.get(0).getContent().getCompte().getIban();
         return CollectionModel.of(cartebancaireModel,
                 linkTo(methodOn(CarteBancaireRepresentation.class)
-                        .getAllCarteBancaire()).withSelfRel());
+                        .getAllCarteByIdCompte(clientId, compteId)).withSelfRel());
     }
 }

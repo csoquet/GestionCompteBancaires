@@ -23,17 +23,17 @@ public class CompteAssembler implements RepresentationModelAssembler<Compte, Ent
 
     @Override
     public EntityModel<Compte> toModel(Compte compte) {
+
+        String clientId = compte.getClient().getIdclient();
         return EntityModel.of(compte,
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(compte.getIdcompte())).withSelfRel(),
+                        .getOneCompte(clientId, compte.getIban())).withSelfRel(),
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getAllComptes()).withRel("collection"),
+                        .getAllComptesByIdClient(clientId)).withRel("collection"),
                 linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperationDebitByIdCompte(compte.getIdcompte())).withRel("operations"),
-                linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperationCreditByIdCompte(compte.getIdcompte())).withRel("operations"),
+                        .getAllOperationByIdCompte(compte.getClient().getIdclient(), compte.getIban())).withRel("operations"),
                 linkTo(methodOn(CarteBancaireRepresentation.class)
-                        .getAllCarteByIdCompte(compte.getIdcompte())).withRel("cartes")
+                        .getAllCarteByIdCompte(clientId, compte.getIban())).withRel("cartes")
         );
 
     }
@@ -45,6 +45,6 @@ public class CompteAssembler implements RepresentationModelAssembler<Compte, Ent
                 .collect(Collectors.toList());
         return CollectionModel.of(compteModel,
                 linkTo(methodOn(CompteRepresentation.class)
-                        .getAllComptes()).withSelfRel());
+                        .getAllComptesByIdClient(compteModel.get(0).getContent().getClient().getIdclient())).withSelfRel());
     }
 }

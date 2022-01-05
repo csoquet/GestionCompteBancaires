@@ -23,6 +23,4 @@ public class CarteBancaireInput {
     private Double plafond;
     private Boolean sanscontact;
     private Boolean virtuelle;
-    @JsonIgnore
-    private Compte compte;
 }

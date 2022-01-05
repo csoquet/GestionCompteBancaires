@@ -26,14 +26,13 @@ public class OperationInput {
     @Positive
     private Double montant;
     @NotNull
+    @Positive
     private Double tauxapplique;
     private String categorie;
     @Size(min = 2)
     private String pays;
-    @JsonIgnore
-    private Compte comptedebiteur;
-    @JsonIgnore
-    private Compte comptecrediteur;
-    @JsonIgnore
-    private CarteBancaire carte;
+
+    private String comptecrediteurIban;
+
+    private String carteNumero;
 }

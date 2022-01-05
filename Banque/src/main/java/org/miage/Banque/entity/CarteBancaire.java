@@ -19,11 +19,8 @@ public class CarteBancaire implements Serializable{
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idcarte", nullable = false)
+    @Column(name = "numcarte", nullable = false)
     @JsonIgnore
-    private String idcarte;
-    @Column(unique = true)
     private String numcarte;
     private String code;
     private String crypto;
@@ -34,7 +31,7 @@ public class CarteBancaire implements Serializable{
     private Boolean virtuelle;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idcompte")
+    @JoinColumn(name = "iban")
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Compte compte;

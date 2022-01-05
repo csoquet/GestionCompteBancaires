@@ -18,6 +18,5 @@ public class CompteInput {
 
     @NotNull
     private Double solde;
-    @JsonIgnore
-    private Client client;
+
 }

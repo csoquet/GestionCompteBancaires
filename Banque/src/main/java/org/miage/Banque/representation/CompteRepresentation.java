@@ -10,22 +10,19 @@ import org.miage.Banque.validator.CompteValidator;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping(value="/comptes", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/clients/{clientId}/comptes", produces = MediaType.APPLICATION_JSON_VALUE)
 @ExposesResourceFor(Compte.class)
 public class CompteRepresentation {
 
@@ -41,26 +38,22 @@ public class CompteRepresentation {
         this.cv = cv;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllComptes() {
-        return ResponseEntity.ok(ca.toCollectionModel(cr.findAll()));
-    }
 
-    @GetMapping(value = "/client/{clientId}")
+    @GetMapping
     public ResponseEntity<?> getAllComptesByIdClient(@PathVariable("clientId") String clientId) {
         Optional<Client> client = clientResource.findById(clientId);
         Iterable<Compte> comptes =  cr.findAllByClient(client);
         return ResponseEntity.ok(ca.toCollectionModel(comptes));
     }
 
-    @GetMapping(value = "/{compteId}")
-    public ResponseEntity<?> getOneCompte(@PathVariable("compteId") String id) {
+    @GetMapping(value = "/{compteIban}")
+    public ResponseEntity<?> getOneCompte(@PathVariable("clientId") String clientId, @PathVariable("compteIban") String id) {
         return Optional.ofNullable(cr.findById(id)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(ca.toModel(i.get())))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/{clientId}")
+    @PostMapping
     @Transactional
     public ResponseEntity<?> saveCompte(@PathVariable("clientId") String clientId, @RequestBody @Valid CompteInput compte) {
 
@@ -74,20 +67,19 @@ public class CompteRepresentation {
             iban += nombreAleatoire;
         }
         Compte compteSave = new Compte(
-                UUID.randomUUID().toString(),
                 iban,
                 compte.getSolde(),
                 client.get()
         );
         Compte saved = cr.save(compteSave);
-        URI location = linkTo(CompteRepresentation.class).slash(saved.getIdcompte()).toUri();
+        URI location = linkTo(methodOn(CompteRepresentation.class).getOneCompte(clientId, saved.getIban())).toUri();
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping(value = "/{compteId}")
+    @DeleteMapping(value = "/{compteIban}")
     @Transactional
-    public ResponseEntity<?> deleteCompte(@PathVariable("compteId") String compteId) {
-        Optional<Compte> compte = cr.findById(compteId);
+    public ResponseEntity<?> deleteCompte(@PathVariable("clientId") String clientId, @PathVariable("compteIban") String compteIban) {
+        Optional<Compte> compte = cr.findById(compteIban);
         compte.get().setClient(null);
         if (compte.isPresent()) {
             cr.delete(compte.get());
@@ -95,18 +87,21 @@ public class CompteRepresentation {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/{compteId}")
+    @PutMapping(value = "/{compteIban}")
     @Transactional
     public ResponseEntity<?> updateCompte(@RequestBody Compte compte,
-                                          @PathVariable("compteId") String compteId) {
+                                          @PathVariable("compteIban") String compteIban,
+                                          @PathVariable("clientId") String clientId) {
+        Client client = clientResource.findById(clientId).get();
         Optional<Compte> body = Optional.ofNullable(compte);
         if (!body.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        if (!cr.existsById(compteId)) {
+        if (!cr.existsById(compteIban)) {
             return ResponseEntity.notFound().build();
         }
-        compte.setIdcompte(compteId);
+        compte.setClient(client);
+        compte.setIban(compteIban);
         cr.save(compte);
         return ResponseEntity.ok().build();
     }

@@ -34,19 +34,19 @@ public class Operation implements Serializable {
     private String pays;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idcomptecrediteur")
+    @JoinColumn(name = "ibandebiteur")
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Compte comptedebiteur;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idcomptedebiteur")
+    @JoinColumn(name = "ibancrediteur")
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Compte comptecrediteur;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idcarte")
+    @JoinColumn(name = "numcarte")
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private CarteBancaire carte;

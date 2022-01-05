@@ -3,7 +3,6 @@ package org.miage.Banque.representation;
 import org.miage.Banque.assembler.CarteBancaireAssembler;
 import org.miage.Banque.entity.CarteBancaire;
 import org.miage.Banque.entity.Compte;
-import org.miage.Banque.entity.Operation;
 import org.miage.Banque.input.CarteBancaireInput;
 import org.miage.Banque.resource.CarteBancaireResource;
 import org.miage.Banque.resource.CompteResource;
@@ -20,9 +19,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping(value="/cartebancaires", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="clients/{clientId}/comptes/{compteIban}/cartebancaires", produces = MediaType.APPLICATION_JSON_VALUE)
 @ExposesResourceFor(CarteBancaire.class)
 public class CarteBancaireRepresentation {
 
@@ -38,30 +38,31 @@ public class CarteBancaireRepresentation {
         this.cbv = cbv;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllCarteBancaire() {
-        return ResponseEntity.ok(cba.toCollectionModel(cbr.findAll()));
-    }
 
-    @GetMapping(value = "/compte/{compteId}")
-    public ResponseEntity<?> getAllCarteByIdCompte(@PathVariable("compteId") String compteId) {
-        Optional<Compte> compte = cr.findById(compteId);
+    @GetMapping
+    public ResponseEntity<?> getAllCarteByIdCompte(@PathVariable("clientId") String clientId,
+                                                   @PathVariable("compteIban") String compteIban) {
+        Optional<Compte> compte = cr.findById(compteIban);
         Iterable<CarteBancaire> cb =  cbr.findAllByCompte(compte);
         return ResponseEntity.ok(cba.toCollectionModel(cb));
     }
 
-    @GetMapping(value = "/{cartebancaireId}")
-    public ResponseEntity<?> getOneCarteBancaire(@PathVariable("cartebancaireId") String id) {
+    @GetMapping(value = "/{cartebancaireNum}")
+    public ResponseEntity<?> getOneCarteBancaire(@PathVariable("clientId") String clientId,
+                                                 @PathVariable("compteIban") String compteIban,
+                                                 @PathVariable("cartebancaireNum") String id) {
         return Optional.ofNullable(cbr.findById(id)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(cba.toModel(i.get())))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/{compteId}")
+    @PostMapping
     @Transactional
-    public ResponseEntity<?> saveCarteBancaire (@PathVariable("compteId") String compteId, @RequestBody @Valid CarteBancaireInput cb) {
+    public ResponseEntity<?> saveCarteBancaire (@PathVariable("clientId") String clientId,
+                                                @PathVariable("compteIban") String compteIban,
+                                                @RequestBody @Valid CarteBancaireInput cb) {
 
-        Compte compte = cr.findById(compteId).get();
+        Compte compte = cr.findById(compteIban).get();
         String numero = "";
         String code= "";
         String crypto= "";
@@ -83,7 +84,6 @@ public class CarteBancaireRepresentation {
         }
 
         CarteBancaire cbSave = new CarteBancaire(
-                UUID.randomUUID().toString(),
                 numero,
                 code,
                 crypto,
@@ -95,14 +95,16 @@ public class CarteBancaireRepresentation {
                 compte
         );
         CarteBancaire saved = cbr.save(cbSave);
-        URI location = linkTo(ClientRepresentation.class).slash(saved.getIdcarte()).toUri();
+        URI location = linkTo(methodOn(CarteBancaireRepresentation.class).getOneCarteBancaire(clientId, compteIban, saved.getNumcarte())).toUri();
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping(value = "/{cartebancaireId}")
+    @DeleteMapping(value = "/{cartebancaireNum}")
     @Transactional
-    public ResponseEntity<?> deleteCarteBancaire(@PathVariable("cartebancaireId") String cartebancaireId) {
-        Optional<CarteBancaire> cb = cbr.findById(cartebancaireId);
+    public ResponseEntity<?> deleteCarteBancaire(@PathVariable("clientId") String clientId,
+                                                 @PathVariable("compteIban") String compteIban,
+                                                 @PathVariable("cartebancaireNum") String cartebancaireNum) {
+        Optional<CarteBancaire> cb = cbr.findById(cartebancaireNum);
         cb.get().setCompte(null);
         if (cb.isPresent()) {
             cbr.delete(cb.get());
@@ -110,18 +112,22 @@ public class CarteBancaireRepresentation {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/{cartebancaireId}")
+    @PutMapping(value = "/{cartebancaireNum}")
     @Transactional
-    public ResponseEntity<?> updateCarteBancaire(@RequestBody CarteBancaire cb,
-                                          @PathVariable("cartebancaireId") String cartebancaireId) {
+    public ResponseEntity<?> updateCarteBancaire(@PathVariable("clientId") String clientId,
+                                                 @PathVariable("compteIban") String compteIban,
+                                                 @PathVariable("cartebancaireNum") String cartebancaireNum,
+                                                 @RequestBody CarteBancaire cb) {
+        Compte compte = cr.findById(compteIban).get();
         Optional<CarteBancaire> body = Optional.ofNullable(cb);
         if (!body.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        if (!cbr.existsById(cartebancaireId)) {
+        if (!cbr.existsById(cartebancaireNum)) {
             return ResponseEntity.notFound().build();
         }
-        cb.setIdcarte(cartebancaireId);
+        cb.setCompte(compte);
+        cb.setNumcarte(cartebancaireNum);
         cbr.save(cb);
         return ResponseEntity.ok().build();
     }

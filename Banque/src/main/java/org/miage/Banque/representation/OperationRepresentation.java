@@ -2,14 +2,12 @@ package org.miage.Banque.representation;
 
 import org.miage.Banque.assembler.OperationAssembler;
 import org.miage.Banque.entity.CarteBancaire;
-import org.miage.Banque.entity.Client;
 import org.miage.Banque.entity.Compte;
 import org.miage.Banque.entity.Operation;
 import org.miage.Banque.input.OperationInput;
 import org.miage.Banque.resource.CarteBancaireResource;
 import org.miage.Banque.resource.CompteResource;
 import org.miage.Banque.resource.OperationResource;
-import org.miage.Banque.validator.OperationValidator;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +21,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping(value="/operations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/clients/{clientId}/comptes/{compteIban}/operations", produces = MediaType.APPLICATION_JSON_VALUE)
 @ExposesResourceFor(Operation.class)
 public class OperationRepresentation {
 
@@ -33,49 +32,41 @@ public class OperationRepresentation {
     private final CarteBancaireResource carteResource;
     private final OperationResource or;
     private final OperationAssembler oa;
-    private final OperationValidator ov;
 
-    public OperationRepresentation(CompteResource cr, CarteBancaireResource carteResource, OperationResource or, OperationAssembler oa, OperationValidator ov) {
+    public OperationRepresentation(CompteResource cr, CarteBancaireResource carteResource, OperationResource or, OperationAssembler oa) {
         this.cr = cr;
         this.carteResource = carteResource;
         this.or = or;
         this.oa = oa;
-        this.ov = ov;
     }
+
 
     @GetMapping
-    public ResponseEntity<?> getAllOperations() {
-        return ResponseEntity.ok(oa.toCollectionModel(or.findAll()));
-    }
-
-    @GetMapping(value = "/compte/debit/{compteId}")
-    public ResponseEntity<?> getAllOperationDebitByIdCompte(@PathVariable("compteId") String compteId) {
-        Optional<Compte> compte = cr.findById(compteId);
+    public ResponseEntity<?> getAllOperationByIdCompte(@PathVariable("clientId") String clientId,
+                                                             @PathVariable("compteIban") String compteIban) {
+        Optional<Compte> compte = cr.findById(compteIban);
         Iterable<Operation> operations =  or.findAllByComptedebiteur(compte);
         return ResponseEntity.ok(oa.toCollectionModel(operations));
     }
 
-    @GetMapping(value = "/compte/credit/{compteId}")
-    public ResponseEntity<?> getAllOperationCreditByIdCompte(@PathVariable("compteId") String compteId) {
-        Optional<Compte> compte = cr.findById(compteId);
-        Iterable<Operation> operations =  or.findAllByComptecrediteur(compte);
-        return ResponseEntity.ok(oa.toCollectionModel(operations));
-    }
-
     @GetMapping(value = "/{operationId}")
-    public ResponseEntity<?> getOneOperation(@PathVariable("operationId") String id) {
+    public ResponseEntity<?> getOneOperation(@PathVariable("clientId") String clientId,
+                                             @PathVariable("compteIban") String compteIban,
+                                             @PathVariable("operationId") String id) {
         return Optional.ofNullable(or.findById(id)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(oa.toModel(i.get())))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(value = "/{comptedebiteurIban}/{comptecrediteurIban}/{carteNumero}")
+    @PostMapping
     @Transactional
-    public ResponseEntity<?> saveOperation(@PathVariable("comptedebiteurIban") String comptedebiteurIban, @PathVariable("comptecrediteurIban") String comptecrediteurIban , @PathVariable("carteNumero") String carteNumero, @RequestBody @Valid OperationInput operation) {
+    public ResponseEntity<?> saveOperation(@PathVariable("clientId") String clientId,
+                                           @PathVariable("compteIban") String compteIban,
+                                           @RequestBody @Valid OperationInput operation) {
 
-        Compte comptedebiteur = cr.findByIban(comptedebiteurIban);
-        Compte comptecrediteur = cr.findByIban(comptecrediteurIban);
-        CarteBancaire carte = carteResource.findByNumcarte(carteNumero);
+        Compte comptedebiteur = cr.findByIban(compteIban);
+        Compte comptecrediteur = cr.findByIban(operation.getComptecrediteurIban());
+        CarteBancaire carte = carteResource.findByNumcarte(operation.getCarteNumero());
         if(carte.getBloque()){
             return ResponseEntity.badRequest().build();
         }
@@ -104,7 +95,7 @@ public class OperationRepresentation {
         );
 
         Operation saved = or.save(operationSave);
-        URI location = linkTo(OperationRepresentation.class).slash(saved.getIdoperation()).toUri();
+        URI location = linkTo(methodOn(OperationRepresentation.class).getOneOperation(clientId, compteIban, saved.getIdoperation())).toUri();
         return ResponseEntity.created(location).build();
     }
 

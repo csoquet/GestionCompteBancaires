@@ -12,5 +12,4 @@ import java.util.Optional;
 public interface OperationResource extends JpaRepository<Operation, String> {
 
     Iterable<Operation> findAllByComptedebiteur(Optional<Compte> comptedebiteur);
-    Iterable<Operation> findAllByComptecrediteur(Optional<Compte> comptecrediteur);
 }
