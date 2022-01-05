@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @RepositoryRestResource(collectionResourceRel = "cartebancaires")
 public interface CarteBancaireResource extends JpaRepository<CarteBancaire, String> {
-    Iterable<CarteBancaire> findAllByCompte(Optional<Compte> compte);
+    Iterable<CarteBancaire> findAllByCompteAndSupprimerFalse(Optional<Compte> compte);
     CarteBancaire findByNumcarte(String numcarte);
 }

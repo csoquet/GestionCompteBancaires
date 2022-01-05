@@ -67,7 +67,7 @@ public class OperationRepresentation {
         Compte comptedebiteur = cr.findByIban(compteIban);
         Compte comptecrediteur = cr.findByIban(operation.getComptecrediteurIban());
         CarteBancaire carte = carteResource.findByNumcarte(operation.getCarteNumero());
-        if(carte.getBloque()){
+        if(carte.getBloque() || carte.getSupprimer()){
             return ResponseEntity.badRequest().build();
         }
         if(carte.getVirtuelle()){

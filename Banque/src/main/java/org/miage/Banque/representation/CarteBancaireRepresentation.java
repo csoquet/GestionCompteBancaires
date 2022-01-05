@@ -43,7 +43,7 @@ public class CarteBancaireRepresentation {
     public ResponseEntity<?> getAllCarteByIdCompte(@PathVariable("clientId") String clientId,
                                                    @PathVariable("compteIban") String compteIban) {
         Optional<Compte> compte = cr.findById(compteIban);
-        Iterable<CarteBancaire> cb =  cbr.findAllByCompte(compte);
+        Iterable<CarteBancaire> cb =  cbr.findAllByCompteAndSupprimerFalse(compte);
         return ResponseEntity.ok(cba.toCollectionModel(cb));
     }
 
@@ -92,6 +92,7 @@ public class CarteBancaireRepresentation {
                 cb.getPlafond(),
                 cb.getSanscontact(),
                 cb.getVirtuelle(),
+                false,
                 compte
         );
         CarteBancaire saved = cbr.save(cbSave);
@@ -105,9 +106,9 @@ public class CarteBancaireRepresentation {
                                                  @PathVariable("compteIban") String compteIban,
                                                  @PathVariable("cartebancaireNum") String cartebancaireNum) {
         Optional<CarteBancaire> cb = cbr.findById(cartebancaireNum);
-        cb.get().setCompte(null);
         if (cb.isPresent()) {
-            cbr.delete(cb.get());
+            cb.get().setSupprimer(true);
+            cbr.save(cb.get());
         }
         return ResponseEntity.noContent().build();
     }
