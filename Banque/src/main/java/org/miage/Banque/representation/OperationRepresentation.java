@@ -17,6 +17,11 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,12 +67,19 @@ public class OperationRepresentation {
     @Transactional
     public ResponseEntity<?> saveOperation(@PathVariable("clientId") String clientId,
                                            @PathVariable("compteIban") String compteIban,
-                                           @RequestBody @Valid OperationInput operation) {
+                                           @RequestBody @Valid OperationInput operation) throws ParseException {
 
         Compte comptedebiteur = cr.findByIban(compteIban);
         Compte comptecrediteur = cr.findByIban(operation.getComptecrediteurIban());
         CarteBancaire carte = carteResource.findByNumcarte(operation.getCarteNumero());
         if(carte.getBloque() || carte.getSupprimer()){ //Si la carte est bloquée ou supprimer alors on ne peut pas l'utiliser
+            return ResponseEntity.badRequest().build();
+        }
+        LocalDate date = LocalDate.now();
+        Date dateExpiration = new SimpleDateFormat("dd-MM-yyyy").parse(carte.getExpiration());
+        LocalDate dateE = dateExpiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        if(date.isEqual(dateE) || date.isAfter(dateE)){
+            carte.setSupprimer(true);
             return ResponseEntity.badRequest().build();
         }
         if(carte.getVirtuelle()){ //Si c'est une carte virtuelle alors elle est supprimer après l'utilisation

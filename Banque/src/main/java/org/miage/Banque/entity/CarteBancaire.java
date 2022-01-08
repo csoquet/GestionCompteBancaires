@@ -29,8 +29,11 @@ public class CarteBancaire implements Serializable{
     private Double plafond;
     private Boolean sanscontact;
     private Boolean virtuelle;
+    private String expiration;
     @JsonIgnore
     private Boolean supprimer;
+
+
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "iban")

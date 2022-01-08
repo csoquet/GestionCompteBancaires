@@ -15,6 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -82,7 +88,21 @@ public class CarteBancaireRepresentation {
             int nombreAleatoire = Min + (int)(Math.random() * (Max - Min) + 1);
             crypto += nombreAleatoire;
         }
-
+        SimpleDateFormat dtf = new SimpleDateFormat("dd-MM-yyyy");
+        Date date = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.YEAR, 2);
+        date = c.getTime();
+        String expiration = dtf.format(date);
+        if(cb.getVirtuelle()){
+            Date date2 = new Date();
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(date2);
+            c2.add(Calendar.DATE, 15);
+            date2 = c2.getTime();
+            expiration = dtf.format(date2);
+        }
         CarteBancaire cbSave = new CarteBancaire(
                 numero,
                 code,
@@ -92,6 +112,7 @@ public class CarteBancaireRepresentation {
                 cb.getPlafond(),
                 cb.getSanscontact(),
                 cb.getVirtuelle(),
+                expiration,
                 false,
                 compte
         );
