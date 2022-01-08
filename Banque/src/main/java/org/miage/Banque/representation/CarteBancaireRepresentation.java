@@ -6,7 +6,6 @@ import org.miage.Banque.entity.Compte;
 import org.miage.Banque.input.CarteBancaireInput;
 import org.miage.Banque.resource.CarteBancaireResource;
 import org.miage.Banque.resource.CompteResource;
-import org.miage.Banque.validator.CarteBancaireValidator;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +15,9 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -35,13 +30,11 @@ public class CarteBancaireRepresentation {
     private final CompteResource cr;
     private final CarteBancaireResource cbr;
     private final CarteBancaireAssembler cba;
-    private final CarteBancaireValidator cbv;
 
-    public CarteBancaireRepresentation(CompteResource cr, CarteBancaireResource cbr, CarteBancaireAssembler cba, CarteBancaireValidator cbv) {
+    public CarteBancaireRepresentation(CompteResource cr, CarteBancaireResource cbr, CarteBancaireAssembler cba) {
         this.cr = cr;
         this.cbr = cbr;
         this.cba = cba;
-        this.cbv = cbv;
     }
 
 
@@ -88,26 +81,28 @@ public class CarteBancaireRepresentation {
             int nombreAleatoire = Min + (int)(Math.random() * (Max - Min) + 1);
             crypto += nombreAleatoire;
         }
-        SimpleDateFormat dtf = new SimpleDateFormat("dd-MM-yyyy");
+
+        SimpleDateFormat dtf = new SimpleDateFormat("dd-MM-yyyy"); //On initialise le format de date final souhaité
         Date date = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(date);
-        c.add(Calendar.YEAR, 2);
+        c.add(Calendar.YEAR, 2); //On ajoute 2 année à la date d'expiration si la carte n'est pas virtuelle
         date = c.getTime();
-        String expiration = dtf.format(date);
-        if(cb.getVirtuelle()){
+        String expiration = dtf.format(date); //On met en forme la date
+
+        if(cb.getVirtuelle()){ // Si la carte est virtuelle alors
             Date date2 = new Date();
             Calendar c2 = Calendar.getInstance();
             c2.setTime(date2);
-            c2.add(Calendar.DATE, 15);
+            c2.add(Calendar.DATE, 15); //On ajoute seulement 15 jours à la date d'experation
             date2 = c2.getTime();
-            expiration = dtf.format(date2);
+            expiration = dtf.format(date2); //On met en forme la date
         }
         CarteBancaire cbSave = new CarteBancaire(
                 numero,
                 code,
                 crypto,
-                cb.getBloque(),
+                false,
                 cb.getLocalisation(),
                 cb.getPlafond(),
                 cb.getSanscontact(),

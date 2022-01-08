@@ -4,7 +4,6 @@ import org.miage.Banque.assembler.ClientAssembler;
 import org.miage.Banque.entity.Client;
 import org.miage.Banque.input.ClientInput;
 import org.miage.Banque.resource.ClientResource;
-import org.miage.Banque.validator.ClientValidator;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +24,10 @@ public class ClientRepresentation {
 
     private final ClientResource cr;
     private final ClientAssembler ca;
-    private final ClientValidator cv;
 
-    public ClientRepresentation(ClientResource cr, ClientAssembler ca, ClientValidator cv) {
+    public ClientRepresentation(ClientResource cr, ClientAssembler ca) {
         this.cr = cr;
         this.ca = ca;
-        this.cv = cv;
     }
 
     @GetMapping

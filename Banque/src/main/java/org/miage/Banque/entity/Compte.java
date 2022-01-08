@@ -1,17 +1,14 @@
 package org.miage.Banque.entity;
 
-import java.io.Serializable;
-import java.util.Set;
-
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Data

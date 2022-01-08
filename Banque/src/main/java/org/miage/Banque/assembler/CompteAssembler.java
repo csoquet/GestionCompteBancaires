@@ -1,9 +1,7 @@
 package org.miage.Banque.assembler;
 
 import org.miage.Banque.entity.Compte;
-import org.miage.Banque.entity.Operation;
 import org.miage.Banque.representation.CarteBancaireRepresentation;
-import org.miage.Banque.representation.ClientRepresentation;
 import org.miage.Banque.representation.CompteRepresentation;
 import org.miage.Banque.representation.OperationRepresentation;
 import org.springframework.hateoas.CollectionModel;

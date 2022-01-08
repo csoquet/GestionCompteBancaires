@@ -6,7 +6,6 @@ import org.miage.Banque.entity.Compte;
 import org.miage.Banque.input.CompteInput;
 import org.miage.Banque.resource.ClientResource;
 import org.miage.Banque.resource.CompteResource;
-import org.miage.Banque.validator.CompteValidator;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -29,13 +27,11 @@ public class CompteRepresentation {
     private final ClientResource clientResource;
     private final CompteResource cr;
     private final CompteAssembler ca;
-    private final CompteValidator cv;
 
-    public CompteRepresentation(ClientResource clientResource, CompteResource cr, CompteAssembler ca, CompteValidator cv) {
+    public CompteRepresentation(ClientResource clientResource, CompteResource cr, CompteAssembler ca) {
         this.clientResource = clientResource;
         this.cr = cr;
         this.ca = ca;
-        this.cv = cv;
     }
 
 

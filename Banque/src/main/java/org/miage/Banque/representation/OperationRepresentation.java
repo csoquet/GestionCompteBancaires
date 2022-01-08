@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -72,27 +73,54 @@ public class OperationRepresentation {
         Compte comptedebiteur = cr.findByIban(compteIban);
         Compte comptecrediteur = cr.findByIban(operation.getComptecrediteurIban());
         CarteBancaire carte = carteResource.findByNumcarte(operation.getCarteNumero());
+
+        /* Partie carte bloqué et carte supprimer */
         if(carte.getBloque() || carte.getSupprimer()){ //Si la carte est bloquée ou supprimer alors on ne peut pas l'utiliser
             return ResponseEntity.badRequest().build();
         }
-        LocalDate date = LocalDate.now();
-        Date dateExpiration = new SimpleDateFormat("dd-MM-yyyy").parse(carte.getExpiration());
-        LocalDate dateE = dateExpiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        if(date.isEqual(dateE) || date.isAfter(dateE)){
-            carte.setSupprimer(true);
-            return ResponseEntity.badRequest().build();
+
+        /* Partie Expiration de la carte*/
+        LocalDate date = LocalDate.now(); //Calcul la date du jour
+        Date dateExpiration = new SimpleDateFormat("dd-MM-yyyy").parse(carte.getExpiration()); //Calcul de la date d'expiration
+        LocalDate dateE = dateExpiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); //Mise en forme de la date d'expiration
+        if(date.isEqual(dateE) || date.isAfter(dateE)){ //Si la date d'expiration est aujourd'hui ou si elle est déjà passé
+            carte.setSupprimer(true); //On supprime la carte
+            return ResponseEntity.badRequest().build(); //Et on renvoie une erreur
         }
+
+        /* Partie limite de plafond de la carte */
+        LocalDate dateAvant = date.minusDays(30); //On calcule la date 30 jour avant la date d'aujourd'hui
+        List<Operation> operationCarte = or.findAllByCarte(carte); //On récupère toutes les opérations de la carte bancaire
+        Double montantTotal = 0.0;
+        for(Operation o : operationCarte){ //On parcours les opéraitons
+            LocalDate dateOperation = o.getDateheure().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); //On convertis la date dans un format
+            if(dateOperation.isAfter(dateAvant) && dateOperation.isBefore(date)){ //Si l'opération a eu lieu entre aujourd'hui et 30 jours avant
+                montantTotal += o.getMontant(); //Alors on enregistre le montant
+            }
+        }
+        if(montantTotal >= carte.getPlafond()){ //Si le montant total dépasse le plafond
+            return ResponseEntity.badRequest().build(); //Alors on renvoie une erreur
+        }
+
+        /* Partie carte virtuelle utilisé */
         if(carte.getVirtuelle()){ //Si c'est une carte virtuelle alors elle est supprimer après l'utilisation
             carte.setSupprimer(true);
         }
 
         Operation operationSave;
+
+        /* Partie du taux de change */
         Double montant = operation.getMontant();
         if(!comptedebiteur.getClient().getPays().equals(operation.getPays())) { //Si le paiement n'a pas lieu dans le même pays que le compte
             montant = operation.getMontant() *  operation.getTauxapplique();
         }
-        comptedebiteur.setSolde(comptedebiteur.getSolde() - montant);
-        comptecrediteur.setSolde(comptecrediteur.getSolde() + montant);
+        /* Partie du solde du compte */
+        if(comptedebiteur.getSolde() < montant){ //Si le compte n'a pas assez de solde
+            return ResponseEntity.badRequest().build(); //On envoie une erreur
+        }
+        comptedebiteur.setSolde(comptedebiteur.getSolde() - montant); //Sinon on débite le compte débiteur
+        comptecrediteur.setSolde(comptecrediteur.getSolde() + montant); //Et on crédite le compte créditeur
+
         operationSave = new Operation(
                 UUID.randomUUID().toString(),
                 new Timestamp(System.currentTimeMillis()),
