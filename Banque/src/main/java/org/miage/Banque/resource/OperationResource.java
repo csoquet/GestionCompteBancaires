@@ -14,4 +14,5 @@ public interface OperationResource extends JpaRepository<Operation, String> {
 
     Iterable<Operation> findAllByComptedebiteur(Optional<Compte> comptedebiteur);
     List<Operation> findAllByCarte(CarteBancaire carte);
+    Optional<Operation> findByIdoperationAndComptedebiteur(String id, Compte compte);
 }

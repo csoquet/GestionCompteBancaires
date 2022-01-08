@@ -2,9 +2,11 @@ package org.miage.Banque.representation;
 
 import org.miage.Banque.assembler.CarteBancaireAssembler;
 import org.miage.Banque.entity.CarteBancaire;
+import org.miage.Banque.entity.Client;
 import org.miage.Banque.entity.Compte;
 import org.miage.Banque.input.CarteBancaireInput;
 import org.miage.Banque.resource.CarteBancaireResource;
+import org.miage.Banque.resource.ClientResource;
 import org.miage.Banque.resource.CompteResource;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
@@ -27,11 +29,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @ExposesResourceFor(CarteBancaire.class)
 public class CarteBancaireRepresentation {
 
+    private final ClientResource clientR;
     private final CompteResource cr;
     private final CarteBancaireResource cbr;
     private final CarteBancaireAssembler cba;
 
-    public CarteBancaireRepresentation(CompteResource cr, CarteBancaireResource cbr, CarteBancaireAssembler cba) {
+    public CarteBancaireRepresentation(ClientResource clientR ,CompteResource cr, CarteBancaireResource cbr, CarteBancaireAssembler cba) {
+        this.clientR = clientR;
         this.cr = cr;
         this.cbr = cbr;
         this.cba = cba;
@@ -41,7 +45,8 @@ public class CarteBancaireRepresentation {
     @GetMapping
     public ResponseEntity<?> getAllCarteByIdCompte(@PathVariable("clientId") String clientId,
                                                    @PathVariable("compteIban") String compteIban) {
-        Optional<Compte> compte = cr.findById(compteIban);
+        Client client = clientR.findById(clientId).get();
+        Optional<Compte> compte = cr.findByClientAndIban(client, compteIban);
         Iterable<CarteBancaire> cb =  cbr.findAllByCompteAndSupprimerFalse(compte);
         return ResponseEntity.ok(cba.toCollectionModel(cb));
     }
@@ -50,7 +55,9 @@ public class CarteBancaireRepresentation {
     public ResponseEntity<?> getOneCarteBancaire(@PathVariable("clientId") String clientId,
                                                  @PathVariable("compteIban") String compteIban,
                                                  @PathVariable("cartebancaireNum") String id) {
-        return Optional.ofNullable(cbr.findById(id)).filter(Optional::isPresent)
+        Client client = clientR.findById(clientId).get();
+        Optional<Compte> compte = cr.findByClientAndIban(client, compteIban);
+        return Optional.ofNullable(cbr.findByNumcarteAndCompte(id, compte.get())).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(cba.toModel(i.get())))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -61,7 +68,8 @@ public class CarteBancaireRepresentation {
                                                 @PathVariable("compteIban") String compteIban,
                                                 @RequestBody @Valid CarteBancaireInput cb) {
 
-        Compte compte = cr.findById(compteIban).get();
+        Client client = clientR.findById(clientId).get();
+        Compte compte = cr.findByClientAndIban(client, compteIban).get();
         String numero = "";
         String code= "";
         String crypto= "";
@@ -121,7 +129,9 @@ public class CarteBancaireRepresentation {
     public ResponseEntity<?> deleteCarteBancaire(@PathVariable("clientId") String clientId,
                                                  @PathVariable("compteIban") String compteIban,
                                                  @PathVariable("cartebancaireNum") String cartebancaireNum) {
-        Optional<CarteBancaire> cb = cbr.findById(cartebancaireNum);
+        Client client = clientR.findById(clientId).get();
+        Compte compte = cr.findByClientAndIban(client, compteIban).get();
+        Optional<CarteBancaire> cb = cbr.findByNumcarteAndCompte(cartebancaireNum, compte);
         if (cb.isPresent()) {
             cb.get().setSupprimer(true);
             cbr.save(cb.get());
@@ -135,12 +145,13 @@ public class CarteBancaireRepresentation {
                                                  @PathVariable("compteIban") String compteIban,
                                                  @PathVariable("cartebancaireNum") String cartebancaireNum,
                                                  @RequestBody CarteBancaire cb) {
-        Compte compte = cr.findById(compteIban).get();
+        Client client = clientR.findById(clientId).get();
+        Compte compte = cr.findByClientAndIban(client, compteIban).get();
         Optional<CarteBancaire> body = Optional.ofNullable(cb);
         if (!body.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        if (!cbr.existsById(cartebancaireNum)) {
+        if (!cbr.existsByNumcarteAndCompte(cartebancaireNum, compte)) {
             return ResponseEntity.notFound().build();
         }
         cb.setCompte(compte);

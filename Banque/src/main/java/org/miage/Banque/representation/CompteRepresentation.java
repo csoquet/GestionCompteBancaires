@@ -44,7 +44,8 @@ public class CompteRepresentation {
 
     @GetMapping(value = "/{compteIban}")
     public ResponseEntity<?> getOneCompte(@PathVariable("clientId") String clientId, @PathVariable("compteIban") String id) {
-        return Optional.ofNullable(cr.findById(id)).filter(Optional::isPresent)
+        Client client = clientResource.findById(clientId).get();
+        return Optional.ofNullable(cr.findByClientAndIban(client, id)).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(ca.toModel(i.get())))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -75,7 +76,8 @@ public class CompteRepresentation {
     @DeleteMapping(value = "/{compteIban}")
     @Transactional
     public ResponseEntity<?> deleteCompte(@PathVariable("clientId") String clientId, @PathVariable("compteIban") String compteIban) {
-        Optional<Compte> compte = cr.findById(compteIban);
+        Client client = clientResource.findById(clientId).get();
+        Optional<Compte> compte = cr.findByClientAndIban(client, compteIban);
         compte.get().setClient(null);
         if (compte.isPresent()) {
             cr.delete(compte.get());
@@ -93,7 +95,7 @@ public class CompteRepresentation {
         if (!body.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        if (!cr.existsById(compteIban)) {
+        if (!cr.existsByClientAndIban(client, compteIban)) {
             return ResponseEntity.notFound().build();
         }
         compte.setClient(client);

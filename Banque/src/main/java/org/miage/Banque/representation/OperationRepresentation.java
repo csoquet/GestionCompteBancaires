@@ -2,10 +2,12 @@ package org.miage.Banque.representation;
 
 import org.miage.Banque.assembler.OperationAssembler;
 import org.miage.Banque.entity.CarteBancaire;
+import org.miage.Banque.entity.Client;
 import org.miage.Banque.entity.Compte;
 import org.miage.Banque.entity.Operation;
 import org.miage.Banque.input.OperationInput;
 import org.miage.Banque.resource.CarteBancaireResource;
+import org.miage.Banque.resource.ClientResource;
 import org.miage.Banque.resource.CompteResource;
 import org.miage.Banque.resource.OperationResource;
 import org.springframework.hateoas.server.ExposesResourceFor;
@@ -34,12 +36,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @ExposesResourceFor(Operation.class)
 public class OperationRepresentation {
 
+    private final ClientResource clientR;
     private final CompteResource cr;
     private final CarteBancaireResource carteResource;
     private final OperationResource or;
     private final OperationAssembler oa;
 
-    public OperationRepresentation(CompteResource cr, CarteBancaireResource carteResource, OperationResource or, OperationAssembler oa) {
+    public OperationRepresentation(ClientResource clientR, CompteResource cr, CarteBancaireResource carteResource, OperationResource or, OperationAssembler oa) {
+        this.clientR = clientR;
         this.cr = cr;
         this.carteResource = carteResource;
         this.or = or;
@@ -50,7 +54,8 @@ public class OperationRepresentation {
     @GetMapping
     public ResponseEntity<?> getAllOperationByIdCompte(@PathVariable("clientId") String clientId,
                                                              @PathVariable("compteIban") String compteIban) {
-        Optional<Compte> compte = cr.findById(compteIban);
+        Client client = clientR.findById(clientId).get();
+        Optional<Compte> compte = cr.findByClientAndIban(client, compteIban);
         Iterable<Operation> operations =  or.findAllByComptedebiteur(compte);
         return ResponseEntity.ok(oa.toCollectionModel(operations));
     }
@@ -59,7 +64,9 @@ public class OperationRepresentation {
     public ResponseEntity<?> getOneOperation(@PathVariable("clientId") String clientId,
                                              @PathVariable("compteIban") String compteIban,
                                              @PathVariable("operationId") String id) {
-        return Optional.ofNullable(or.findById(id)).filter(Optional::isPresent)
+        Client client = clientR.findById(clientId).get();
+        Optional<Compte> compte = cr.findByClientAndIban(client, compteIban);
+        return Optional.ofNullable(or.findByIdoperationAndComptedebiteur(id, compte.get())).filter(Optional::isPresent)
                 .map(i -> ResponseEntity.ok(oa.toModel(i.get())))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -70,9 +77,10 @@ public class OperationRepresentation {
                                            @PathVariable("compteIban") String compteIban,
                                            @RequestBody @Valid OperationInput operation) throws ParseException {
 
-        Compte comptedebiteur = cr.findByIban(compteIban);
-        Compte comptecrediteur = cr.findByIban(operation.getComptecrediteurIban());
-        CarteBancaire carte = carteResource.findByNumcarte(operation.getCarteNumero());
+        Client client = clientR.findById(clientId).get();
+        Compte comptedebiteur = cr.findByClientAndIban(client, compteIban).get();
+        Compte comptecrediteur =  cr.findByIban(operation.getComptecrediteurIban());
+        CarteBancaire carte = carteResource.findByNumcarteAndCompte(operation.getCarteNumero(), comptedebiteur).get();
 
         /* Partie carte bloqué et carte supprimer */
         if(carte.getBloque() || carte.getSupprimer()){ //Si la carte est bloquée ou supprimer alors on ne peut pas l'utiliser
