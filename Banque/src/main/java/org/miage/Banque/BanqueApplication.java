@@ -47,14 +47,16 @@ public class BanqueApplication {
 	CommandLineRunner run(ClientService cs, CompteResource compteResource, CarteBancaireResource carteBancaireResource, OperationResource operationResource) {
 		return args -> {
 			Client client2 = new Client("1","Dupont","Bruno", "dupont@test.fr","0000", "15-02-1992", "France", "59RF05400", "0625123621", new ArrayList<>());
+			cs.saveClient(client2);
 			Client client1 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
 			cs.saveClient(client1);
-			cs.saveClient(client2);
 			Role role = new Role("1", "ROLE_USER");
 			Role role2 = new Role("2", "ROLE_ADMIN");
 			cs.saveRole(role);
 			cs.saveRole(role2);
+			cs.addRoleToClient("papa@test.fr", "ROLE_ADMIN");
 			cs.addRoleToClient("dupont@test.fr", "ROLE_USER");
+
 
 			Compte compte1 = new Compte("FR7612548029989876543210917", 500.0, client2);
 			Compte compte2 = new Compte("FR7630003035409876543210925", 200.0, client2);
