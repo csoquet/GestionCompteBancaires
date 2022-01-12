@@ -35,11 +35,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         customAuthentificationFilter.setFilterProcessesUrl("/login");
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/login/**", "/clients/token/refresh/**", "/clients").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_USER");
+        /*http.authorizeRequests().antMatchers(HttpMethod.POST,"/login/**", "/clients").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.GET,"/clients/token/refresh/**", "/console/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/clients", "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().anyRequest().authenticated();
-        //http.authorizeRequests().anyRequest().permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(HttpMethod.PUT, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");*/
+        //http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests().anyRequest().permitAll();
         http.addFilter(customAuthentificationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }

@@ -46,10 +46,10 @@ public class BanqueApplication {
 	@Bean
 	CommandLineRunner run(ClientService cs, CompteResource compteResource, CarteBancaireResource carteBancaireResource, OperationResource operationResource) {
 		return args -> {
-			Client client2 = new Client("1","Dupont","Bruno", "dupont@test.fr","0000", "15-02-1992", "France", "59RF05400", "0625123621", new ArrayList<>());
-			cs.saveClient(client2);
-			Client client1 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
+			Client client1 = new Client("1","Dupont","Bruno", "dupont@test.fr","0000", "15-02-1992", "France", "59RF05400", "0625123621", new ArrayList<>());
 			cs.saveClient(client1);
+			Client client2 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
+			cs.saveClient(client2);
 			Role role = new Role("1", "ROLE_USER");
 			Role role2 = new Role("2", "ROLE_ADMIN");
 			cs.saveRole(role);
@@ -65,7 +65,7 @@ public class BanqueApplication {
 			compteResource.save(compte2);
 			compteResource.save(compte3);
 
-			CarteBancaire carte1 = new CarteBancaire("1234567891234567", "1234", "123", FALSE, FALSE, 1000.0, FALSE, FALSE,"15-03-2022", FALSE, compte1);
+			CarteBancaire carte1 = new CarteBancaire("1234567891234567", "1234", "123", FALSE, FALSE, 1000.0, TRUE, FALSE,"15-03-2022", FALSE, compte1);
 			CarteBancaire carte2 = new CarteBancaire("1234567891235457", "4321", "321", TRUE, FALSE, 2000.0, FALSE, FALSE,"10-05-2023",FALSE, compte2);
 			carteBancaireResource.save(carte1);
 			carteBancaireResource.save(carte2);

@@ -11,9 +11,13 @@ import org.miage.Banque.resource.ClientResource;
 import org.miage.Banque.resource.CompteResource;
 import org.miage.Banque.resource.OperationResource;
 import org.springframework.hateoas.server.ExposesResourceFor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -87,6 +91,14 @@ public class OperationRepresentation {
             return ResponseEntity.badRequest().build();
         }
 
+        /* Partie de vérification du code */
+        if(!carte.getSanscontact()){
+            if(!carte.getCode().equals(operation.getCodeCarte())){
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+
         /* Partie Expiration de la carte*/
         LocalDate date = LocalDate.now(); //Calcul la date du jour
         Date dateExpiration = new SimpleDateFormat("dd-MM-yyyy").parse(carte.getExpiration()); //Calcul de la date d'expiration
@@ -99,7 +111,7 @@ public class OperationRepresentation {
         /* Partie limite de plafond de la carte */
         LocalDate dateAvant = date.minusDays(30); //On calcule la date 30 jour avant la date d'aujourd'hui
         List<Operation> operationCarte = or.findAllByCarte(carte); //On récupère toutes les opérations de la carte bancaire
-        Double montantTotal = 0.0;
+        Double montantTotal = operation.getMontant();
         for(Operation o : operationCarte){ //On parcours les opéraitons
             LocalDate dateOperation = o.getDateheure().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); //On convertis la date dans un format
             if(dateOperation.isAfter(dateAvant) && dateOperation.isBefore(date)){ //Si l'opération a eu lieu entre aujourd'hui et 30 jours avant

@@ -19,19 +19,24 @@ public class ClientInput {
     @NotBlank
     private String nom;
     @Size(min=2)
+    @NotNull
     private String prenom;
     @Pattern(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", message = "Format de l'email invalide")
+    @NotNull
     private String email;
     @Pattern(regexp = "[0-9]+")
+    @NotNull
     private String secret;
     @NotNull
     private String datenaiss;
     @Size(min = 3)
+    @NotNull
     private String pays;
     @NotNull
     private String nopasseport;
     @Size(min = 10, max = 10)
     @Pattern(regexp = "[0-9]+")
+    @NotNull
     private String numtel;
 }

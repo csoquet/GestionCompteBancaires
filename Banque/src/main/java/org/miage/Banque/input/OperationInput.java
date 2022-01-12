@@ -15,9 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 
 public class OperationInput {
-
-    @JsonIgnore
-    private Date dateheure;
+    @NotNull
     @Size(min = 5, max = 60)
     private String libelle;
     @NotNull
@@ -26,11 +24,15 @@ public class OperationInput {
     @NotNull
     @Positive
     private Double tauxapplique;
+
     private String categorie;
+    @NotNull
     @Size(min = 2)
     private String pays;
 
+    @NotNull
     private String comptecrediteurIban;
-
+    @NotNull
     private String carteNumero;
+    private String codeCarte;
 }
