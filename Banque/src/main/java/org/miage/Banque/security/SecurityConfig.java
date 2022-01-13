@@ -1,11 +1,10 @@
 package org.miage.Banque.security;
 
+
 import lombok.RequiredArgsConstructor;
 import org.miage.Banque.filter.CustomAuthentificationFilter;
-import org.miage.Banque.filter.CustomAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,30 +21,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder cryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(cryptPasswordEncoder);
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
+        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthentificationFilter customAuthentificationFilter = new CustomAuthentificationFilter(authenticationManagerBean());
-        customAuthentificationFilter.setFilterProcessesUrl("/login");
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        /*http.authorizeRequests().antMatchers(HttpMethod.POST,"/login/**", "/clients").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET,"/clients/token/refresh/**", "/console/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/clients", "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_USER");
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(HttpMethod.PUT, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");*/
-        //http.authorizeRequests().anyRequest().authenticated();
-        http.authorizeRequests().anyRequest().permitAll();
-        http.addFilter(customAuthentificationFilter);
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    protected void configure(HttpSecurity httpSecurity) throws Exception{
+        CustomAuthentificationFilter customAuthenticationFilter = new CustomAuthentificationFilter(authenticationManagerBean());
+        customAuthenticationFilter.setFilterProcessesUrl("/login");
+        httpSecurity.csrf().disable();
+
+        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        httpSecurity.authorizeRequests().antMatchers("/login/**", "/token/refresh/**").permitAll();
+
+        httpSecurity.csrf().disable();
+        httpSecurity.headers().frameOptions().disable();
+
+        httpSecurity.authorizeRequests().anyRequest().permitAll();
+
+        httpSecurity.addFilter(customAuthenticationFilter);
+        httpSecurity.addFilterBefore(new org.miage.Banque.filters.CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

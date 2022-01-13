@@ -43,7 +43,6 @@ public class ClientService implements UserDetailsService {
         log.info("Sauvegarde de nouveau client");
         client.setSecret(passwordEncoder.encode(client.getSecret()));
         cr.save(client);
-        this.addRoleToClient(client.getEmail(), "ROLE_USER");
         return client;
     }
 
@@ -60,7 +59,7 @@ public class ClientService implements UserDetailsService {
         Client client = cr.findByEmail(email);
         Role role = rr.findByNom(roleNom);
         client.getRoles().add(role);
-        System.out.println("test");
+        log.info(client.getRoles().toString());
 
     }
     public Client getClient(String email){
@@ -87,5 +86,6 @@ public class ClientService implements UserDetailsService {
         });
         return new org.springframework.security.core.userdetails.User(client.getEmail(), client.getSecret(), authorities);
     }
+
 
 }

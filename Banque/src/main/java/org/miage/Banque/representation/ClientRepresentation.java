@@ -1,9 +1,5 @@
 package org.miage.Banque.representation;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -12,16 +8,13 @@ import org.miage.Banque.assembler.ClientAssembler;
 import org.miage.Banque.entity.Client;
 import org.miage.Banque.entity.Role;
 import org.miage.Banque.input.ClientInput;
+import org.miage.Banque.resource.RoleResource;
 import org.miage.Banque.service.ClientService;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +38,8 @@ public class ClientRepresentation {
 
     private final ClientAssembler ca;
     private final ClientService clientService;
+
+
 
     @GetMapping
     public ResponseEntity<?> getAllClients() {
@@ -98,44 +93,13 @@ public class ClientRepresentation {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/token/refresh")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            try{
-                String refreshToken = authorizationHeader.substring("Bearer ".length());
-                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(refreshToken);
-                String email = decodedJWT.getSubject();
-                Client user = clientService.getClient(email);
-                String accessToken = JWT.create()
-                        .withSubject(user.getEmail())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                        .withIssuer(request.getRequestURL().toString())
-                        .withClaim("roles", user.getRoles().stream().map(Role::getNom).collect(Collectors.toList()))
-                        .sign(algorithm);
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", accessToken);
-                tokens.put("refresh_token", refreshToken);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            } catch(Exception exception){
-                response.setHeader("error", exception.getMessage());
-                response.setStatus(HttpStatus.FORBIDDEN.value());
-                //response.sendError(HttpStatus.FORBIDDEN.value());
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", exception.getMessage());
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
-            }
+    @GetMapping("/role/client/{email}")
+    @Transactional
+    public void getClientRole(@PathVariable("email") String email) {
+        Client client = clientService.getClient(email);
+        System.out.println(client.getRoles().toString());
 
-        }
-        else{
-            throw new RuntimeException("Refresh token manquant");
-        }
     }
-
 
 
     @DeleteMapping(value = "/{clientId}")
@@ -151,7 +115,7 @@ public class ClientRepresentation {
     @PutMapping(value = "/{clientId}")
     @Transactional
     public ResponseEntity<?> updateClient(@RequestBody Client client,
-                                               @PathVariable("clientId") String clientId) {
+                                          @PathVariable("clientId") String clientId) {
         Optional<Client> body = Optional.ofNullable(client);
         if (!body.isPresent()) {
             return ResponseEntity.badRequest().build();

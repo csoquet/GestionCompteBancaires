@@ -51,11 +51,10 @@ public class BanqueApplication {
 			Client client2 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
 			cs.saveClient(client2);
 			Role role = new Role("1", "ROLE_USER");
-			Role role2 = new Role("2", "ROLE_ADMIN");
 			cs.saveRole(role);
+			Role role2 = new Role("2", "ROLE_ADMIN");
 			cs.saveRole(role2);
-			cs.addRoleToClient("papa@test.fr", "ROLE_ADMIN");
-			cs.addRoleToClient("dupont@test.fr", "ROLE_USER");
+
 
 
 			Compte compte1 = new Compte("FR7612548029989876543210917", 500.0, client2);
@@ -74,6 +73,9 @@ public class BanqueApplication {
 			Operation operation2 = new Operation ("2",new Date(2020-02-10),"Achat medicaments", 10.0, 0.90, "Pharmacie", "Allemagne",compte2, compte1, carte2);
 			operationResource.save(operation1);
 			operationResource.save(operation2);
+
+			cs.addRoleToClient("papa@test.fr", "ROLE_ADMIN");
+			cs.addRoleToClient("dupont@test.fr", "ROLE_USER");
 
 		};
 	}

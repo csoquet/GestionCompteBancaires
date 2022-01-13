@@ -16,7 +16,6 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idrole", nullable = false)
-    @JsonIgnore
     private String id;
     private String nom;
 }

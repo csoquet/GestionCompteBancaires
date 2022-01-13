@@ -20,7 +20,6 @@ public class Client implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idclient", nullable = false)
-    @JsonIgnore
     private String idclient;
     private String nom;
     private String prenom;
@@ -33,7 +32,9 @@ public class Client implements Serializable {
     private String numtel;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @Column(unique = true)
+    @JoinTable(name = "client_roles",
+            joinColumns = @JoinColumn(name = "client_id", referencedColumnName = "idclient"),
+            inverseJoinColumns = @JoinColumn(name = "roles_id",referencedColumnName = "idrole"))
     private Collection<Role> roles = new ArrayList<>();
 
 
