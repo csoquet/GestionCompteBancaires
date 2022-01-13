@@ -1,5 +1,6 @@
 package org.miage.Banque.assembler;
 
+import lombok.SneakyThrows;
 import org.miage.Banque.entity.CarteBancaire;
 import org.miage.Banque.representation.CarteBancaireRepresentation;
 import org.miage.Banque.representation.CompteRepresentation;
@@ -32,15 +33,25 @@ public class CarteBancaireAssembler implements RepresentationModelAssembler<Cart
         );
     }
 
+    @SneakyThrows
     public CollectionModel<EntityModel<CarteBancaire>> toCollectionModel(Iterable<? extends CarteBancaire> entities) {
         List<EntityModel<CarteBancaire>> cartebancaireModel = StreamSupport
                 .stream(entities.spliterator(), false)
                 .map(i -> toModel(i))
                 .collect(Collectors.toList());
-        String clientId = cartebancaireModel.get(0).getContent().getCompte().getClient().getIdclient();
-        String compteId = cartebancaireModel.get(0).getContent().getCompte().getIban();
-        return CollectionModel.of(cartebancaireModel,
-                linkTo(methodOn(CarteBancaireRepresentation.class)
-                        .getAllCarteByIdCompte(clientId, compteId)).withSelfRel());
+
+        try{
+            CollectionModel collectionModel = CollectionModel.of(cartebancaireModel);
+            if (cartebancaireModel.size() > 0) {
+                String clientId = cartebancaireModel.get(0).getContent().getCompte().getClient().getIdclient();
+                String compteId = cartebancaireModel.get(0).getContent().getCompte().getIban();
+                collectionModel.add(linkTo(methodOn(CarteBancaireRepresentation.class).getAllCarteByIdCompte(clientId, compteId)).withSelfRel());
+            }
+            return collectionModel;
+        } catch (Exception e){
+        throw new Exception("Pas de cartes pour ce compte");
+    }
+
+
     }
 }

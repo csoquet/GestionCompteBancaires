@@ -1,11 +1,13 @@
 package org.miage.Banque.assembler;
 
+import lombok.SneakyThrows;
 import org.miage.Banque.entity.Operation;
 import org.miage.Banque.representation.CarteBancaireRepresentation;
 import org.miage.Banque.representation.CompteRepresentation;
 import org.miage.Banque.representation.OperationRepresentation;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
@@ -38,15 +40,27 @@ public class OperationAssembler implements RepresentationModelAssembler<Operatio
         );
     }
 
+    @SneakyThrows
     public CollectionModel<EntityModel<Operation>> toCollectionModel(Iterable<? extends Operation> entities) {
         List<EntityModel<Operation>> operationModel = StreamSupport
                 .stream(entities.spliterator(), false)
                 .map(i -> toModel(i))
                 .collect(Collectors.toList());
-        String clientId = operationModel.get(0).getContent().getComptedebiteur().getClient().getIdclient();
-        String compteId = operationModel.get(0).getContent().getComptedebiteur().getIban();
-        return CollectionModel.of(operationModel,
-                linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperationByIdCompte(clientId, compteId)).withSelfRel());
+        try {
+
+            CollectionModel collectionModel = CollectionModel.of(operationModel);
+            if (operationModel.size() > 0) {
+                String clientId = operationModel.get(0).getContent().getComptedebiteur().getClient().getIdclient();
+                String compteId = operationModel.get(0).getContent().getComptedebiteur().getIban();
+                collectionModel.add(linkTo(methodOn(OperationRepresentation.class).getAllOperationByIdCompte(clientId, compteId)).withSelfRel());
+            }
+            else{
+               //collectionModel = new CollectionModel();
+            }
+            return collectionModel;
+        } catch (Exception e){
+            throw new Exception("Pas d'operations pour ce compte");
+        }
+
     }
 }
