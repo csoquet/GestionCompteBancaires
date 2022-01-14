@@ -3,6 +3,7 @@ package org.miage.Banque.representation;
 import org.miage.Banque.assembler.CompteAssembler;
 import org.miage.Banque.entity.Client;
 import org.miage.Banque.entity.Compte;
+import org.miage.Banque.entity.Role;
 import org.miage.Banque.input.CompteInput;
 import org.miage.Banque.resource.ClientResource;
 import org.miage.Banque.resource.CompteResource;
@@ -41,6 +42,7 @@ public class CompteRepresentation {
 
     @GetMapping
     //@PostAuthorize("returnObject.content.clientId == authentication.name or hasRole('ROLE_ADMIN')")
+    //VOIR HEADER
     public CollectionModel<EntityModel<Compte>> getAllComptesByIdClient(@PathVariable("clientId") String clientId) {
         Optional<Client> client = clientResource.findById(clientId);
         Iterable<Compte> comptes =  cr.findAllByClient(client);
@@ -62,9 +64,16 @@ public class CompteRepresentation {
     @Transactional
     public ResponseEntity<?> saveCompte(@PathVariable("clientId") String clientId, @RequestBody @Valid CompteInput compte, @AuthenticationPrincipal String clientEmail) {
 
-        Optional<Client> client = clientResource.findById(clientId);
-        if(client.get().getEmail().equals(clientEmail)){
-            String lettre = client.get().getPays().substring(0,2).toUpperCase(); //2 premiere lettre du pays
+        Client client = clientResource.getByIdclient(clientId);
+        Client clientReel = clientResource.findByEmail(clientEmail);
+        boolean admin = false;
+        for (Role role : clientReel.getRoles()) {
+            if(role.getNom().equals("ROLE_ADMIN")){
+                admin = true;
+            }
+        }
+        if(client.getEmail().equals(clientEmail) || admin){
+            String lettre = client.getPays().substring(0,2).toUpperCase(); //2 premiere lettre du pays
             String iban = lettre;
             int Min = 1;
             int Max = 9;
@@ -75,7 +84,7 @@ public class CompteRepresentation {
             Compte compteSave = new Compte(
                     iban,
                     compte.getSolde(),
-                    client.get()
+                    client
             );
             Compte saved = cr.save(compteSave);
             URI location = linkTo(methodOn(CompteRepresentation.class).getOneCompte(clientId, saved.getIban())).toUri();
@@ -89,7 +98,14 @@ public class CompteRepresentation {
     @Transactional
     public ResponseEntity<?> deleteCompte(@PathVariable("clientId") String clientId, @PathVariable("compteIban") String compteIban, @AuthenticationPrincipal String clientEmail) {
         Client client = clientResource.findById(clientId).get();
-        if(client.getEmail().equals(clientEmail)){
+        Client clientReel = clientResource.findByEmail(clientEmail);
+        boolean admin = false;
+        for (Role role : clientReel.getRoles()) {
+            if(role.getNom().equals("ROLE_ADMIN")){
+                admin = true;
+            }
+        }
+        if(client.getEmail().equals(clientEmail) || admin){
             Optional<Compte> compte = cr.findByClientAndIban(client, compteIban);
             compte.get().setClient(null);
             if (compte.isPresent()) {
