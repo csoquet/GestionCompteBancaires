@@ -18,7 +18,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -33,20 +32,19 @@ public class ClientService implements UserDetailsService {
 
     public Iterable<Client> findAll(){ return cr.findAll();}
 
-    public Optional<Client> findById(String clientId){
-        return cr.findById(clientId);
+    public Client findById(String clientId){
+        return cr.getByIdclient(clientId);
     }
 
-    public boolean existById(String clientId) {return cr.existsById(clientId);}
+    public boolean existById(String clientId) {return cr.existsByIdclient(clientId);}
 
     public Client saveClient(Client client){
         log.info("Sauvegarde de nouveau client");
         client.setSecret(passwordEncoder.encode(client.getSecret()));
         cr.save(client);
+        this.addRoleToClient(client.getEmail(), "ROLE_USER");
         return client;
     }
-
-    public Client updateClient(Client client) {return cr.save(client);}
 
     public void delete(Client client) {cr.delete(client);}
 
@@ -59,13 +57,9 @@ public class ClientService implements UserDetailsService {
         Client client = cr.findByEmail(email);
         Role role = rr.findByNom(roleNom);
         client.getRoles().add(role);
-        log.info(client.getRoles().toString());
 
     }
-    public Client getClient(String email){
 
-        return cr.findByEmail(email);
-    }
     public List<Client> getClients(){
         return cr.findAll();
     }

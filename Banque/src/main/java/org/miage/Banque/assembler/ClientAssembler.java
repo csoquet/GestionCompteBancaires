@@ -1,11 +1,5 @@
 package org.miage.Banque.assembler;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import org.miage.Banque.entity.Client;
 import org.miage.Banque.representation.ClientRepresentation;
 import org.miage.Banque.representation.CompteRepresentation;
@@ -14,18 +8,23 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Component
 public class ClientAssembler implements RepresentationModelAssembler<Client, EntityModel<Client>> {
 
     @Override
     public EntityModel<Client> toModel(Client client) {
-        return EntityModel.of(client,
-                linkTo(methodOn(ClientRepresentation.class)
-                        .getOneClient(client.getIdclient())).withSelfRel(),
-                linkTo(methodOn(ClientRepresentation.class)
-                        .getAllClients()).withRel("collection"),
-                linkTo(methodOn(CompteRepresentation.class).getAllComptesByIdClient(client.getIdclient())).withRel("comptes")
-    );
+        EntityModel<Client> clientEntityModel = EntityModel.of(client);
+        clientEntityModel.add(linkTo(methodOn(ClientRepresentation.class).getOneClient(client.getIdclient())).withSelfRel());
+        clientEntityModel.add(linkTo(methodOn(ClientRepresentation.class).getAllClients()).withRel("collection"));
+        clientEntityModel.add(linkTo(methodOn(CompteRepresentation.class).getAllComptesByIdClient(client.getIdclient())).withRel("comptes"));
+        return clientEntityModel;
 
     }
 

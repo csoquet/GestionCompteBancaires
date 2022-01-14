@@ -1,6 +1,5 @@
 package org.miage.Banque.representation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,29 +7,26 @@ import org.miage.Banque.assembler.ClientAssembler;
 import org.miage.Banque.entity.Client;
 import org.miage.Banque.entity.Role;
 import org.miage.Banque.input.ClientInput;
-import org.miage.Banque.resource.RoleResource;
 import org.miage.Banque.service.ClientService;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.ExposesResourceFor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value="/clients")
+@RequestMapping(value="/clients", produces = MediaType.APPLICATION_JSON_VALUE)
 @ExposesResourceFor(Client.class)
 @RequiredArgsConstructor
 @Slf4j
@@ -42,16 +38,17 @@ public class ClientRepresentation {
 
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getAllClients() {
         Iterable<Client> clients = clientService.findAll();
         return ResponseEntity.ok(ca.toCollectionModel(clients));
     }
 
     @GetMapping(value = "/{clientId}")
-    public ResponseEntity<?> getOneClient(@PathVariable("clientId") String id) {
-        return Optional.of(clientService.findById(id)).filter(Optional::isPresent)
-                .map(i -> ResponseEntity.ok(ca.toModel(i.get())))
-                .orElse(ResponseEntity.notFound().build());
+    @PostAuthorize("returnObject.content.email == authentication.name or hasRole('ROLE_ADMIN')")
+    public EntityModel getOneClient(@PathVariable("clientId") String id) {
+            return ca.toModel(clientService.findById(id));
+
     }
 
     @PostMapping
@@ -76,6 +73,7 @@ public class ClientRepresentation {
 
     @PostMapping("/role")
     @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> saveRole(@RequestBody @Valid Role role) {
         Role roleSave = new Role(
                 UUID.randomUUID().toString(),
@@ -88,26 +86,22 @@ public class ClientRepresentation {
 
     @PostMapping("/role/addtoclient")
     @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> saveRoleToClient(@RequestBody RoleToClient form) {
         clientService.addRoleToClient(form.getEmail(), form.getRoleNom());
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/role/client/{email}")
-    @Transactional
-    public void getClientRole(@PathVariable("email") String email) {
-        Client client = clientService.getClient(email);
-        System.out.println(client.getRoles().toString());
-
-    }
-
-
     @DeleteMapping(value = "/{clientId}")
     @Transactional
-    public ResponseEntity<?> deleteClient(@PathVariable("clientId") String clientId) {
-        Optional<Client> client = clientService.findById(clientId);
-        if (client.isPresent()) {
-            clientService.delete(client.get());
+    public ResponseEntity<?> deleteClient(@PathVariable("clientId") String clientId, @AuthenticationPrincipal String clientEmail) {
+        if(clientService.existById(clientId)){
+            Client client = clientService.findById(clientId);
+            if(client.getEmail().equals(clientEmail)){
+                clientService.delete(client);
+                return ResponseEntity.noContent().build();
+            }
+            throw new RuntimeException("Impossible de supprimer un autre client");
         }
         return ResponseEntity.noContent().build();
     }
@@ -115,19 +109,19 @@ public class ClientRepresentation {
     @PutMapping(value = "/{clientId}")
     @Transactional
     public ResponseEntity<?> updateClient(@RequestBody Client client,
-                                          @PathVariable("clientId") String clientId) {
-        Optional<Client> body = Optional.ofNullable(client);
-        if (!body.isPresent()) {
-            return ResponseEntity.badRequest().build();
+                                          @PathVariable("clientId") String clientId,
+                                          @AuthenticationPrincipal String clientEmail) {
+        Client body = client;
+        if (body.getEmail().equals(clientEmail)){
+            if (!clientService.existById(clientId)) {
+                return ResponseEntity.notFound().build();
+            }
+            client.setIdclient(clientId);
+            clientService.saveClient(client);
+            return ResponseEntity.ok().build();
         }
-        if (!clientService.existById(clientId)) {
-            return ResponseEntity.notFound().build();
-        }
-        client.setIdclient(clientId);
-        clientService.saveClient(client);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
-
 }
 
 @Data
