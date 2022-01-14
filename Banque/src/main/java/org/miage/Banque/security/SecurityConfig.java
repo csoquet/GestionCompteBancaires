@@ -28,11 +28,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
-        /*http.authorizeRequests().antMatchers(HttpMethod.POST,"/client").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/clients", "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(HttpMethod.PUT, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/clients/**", "/comptes/**").hasAnyAuthority("ROLE_ADMIN");*/
     }
 
     @Override
@@ -45,7 +40,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/login/**").permitAll();
 
         http.csrf().disable();
-        http.headers().frameOptions().disable();
 
         http.authorizeRequests().anyRequest().permitAll();
 
