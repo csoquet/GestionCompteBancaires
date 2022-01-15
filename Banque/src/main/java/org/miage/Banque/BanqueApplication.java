@@ -11,7 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -46,14 +45,18 @@ public class BanqueApplication {
 	@Bean
 	CommandLineRunner run(ClientService cs, CompteResource compteResource, CarteBancaireResource carteBancaireResource, OperationResource operationResource) {
 		return args -> {
-			Client client1 = new Client("1","Dupont","Bruno", "dupont@test.fr","0000", "15-02-1992", "France", "59RF05400", "0625123621", new ArrayList<>());
-			cs.saveClient(client1);
-			Client client2 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
-			cs.saveClient(client2);
+
 			Role role = new Role("1", "ROLE_USER");
 			cs.saveRole(role);
 			Role role2 = new Role("2", "ROLE_ADMIN");
 			cs.saveRole(role2);
+
+
+			Client client1 = new Client("1","Dupont","Bruno", "dupont@test.fr","0000", "15-02-1992", "France", "59RF05400", "0625123621", new ArrayList<>());
+			client1 = cs.saveClient(client1);
+			Client client2 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
+			client2 = cs.saveClient(client2);
+
 
 
 
@@ -74,8 +77,7 @@ public class BanqueApplication {
 			operationResource.save(operation1);
 			operationResource.save(operation2);
 
-			cs.addRoleToClient("papa@test.fr", "ROLE_ADMIN");
-			cs.addRoleToClient("dupont@test.fr", "ROLE_USER");
+			client2 = cs.addRoleToClient("papa@test.fr", "ROLE_ADMIN");
 
 		};
 	}

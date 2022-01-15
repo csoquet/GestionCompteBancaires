@@ -34,13 +34,13 @@ public class Operation implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ibandebiteur")
     @JsonIgnore
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Compte comptedebiteur;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ibancrediteur")
     @JsonIgnore
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Compte comptecrediteur;
 
     @ManyToOne(cascade = CascadeType.ALL)

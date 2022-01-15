@@ -16,7 +16,7 @@ public class CommercantConfig {
 
     @Bean
     @Primary
-    ServiceInstanceListSupplier serviceInstanceListSupplier(){
+    ServiceInstanceListSupplier service(){
         return new DemoServiceInstanceListSuppler("commercant");
     }
 }
@@ -24,8 +24,8 @@ public class CommercantConfig {
 class DemoServiceInstanceListSuppler implements ServiceInstanceListSupplier {
     private final String serviceId;
 
-    public DemoServiceInstanceListSuppler(String serviceId) {
-        this.serviceId = serviceId;
+    public DemoServiceInstanceListSuppler(String idService) {
+        this.serviceId = idService;
     }
 
     @Override
@@ -39,8 +39,8 @@ class DemoServiceInstanceListSuppler implements ServiceInstanceListSupplier {
                 .asList(new DefaultServiceInstance(serviceId + "1", serviceId,
                                 "localhost", 8082, false),
                         new DefaultServiceInstance(serviceId + "2", serviceId, "localhost",
-                                9092, false),
+                                8083, false),
                         new DefaultServiceInstance(serviceId + "3", serviceId, "localhost",
-                                9999, false)));
+                                8084, false)));
     }
 }

@@ -103,7 +103,7 @@ public class ClientRepresentation {
             }
             throw new RuntimeException("Impossible de supprimer un autre client");
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping(value = "/{clientId}")
@@ -113,9 +113,6 @@ public class ClientRepresentation {
                                           @AuthenticationPrincipal String clientEmail) {
         Client body = client;
         if (body.getEmail().equals(clientEmail)){
-            if (!clientService.existById(clientId)) {
-                return ResponseEntity.notFound().build();
-            }
             client.setIdclient(clientId);
             clientService.saveClient(client);
             return ResponseEntity.ok().build();

@@ -42,7 +42,7 @@ public class ClientService implements UserDetailsService {
         log.info("Sauvegarde de nouveau client");
         client.setSecret(passwordEncoder.encode(client.getSecret()));
         cr.save(client);
-        this.addRoleToClient(client.getEmail(), "ROLE_USER");
+        client = addRoleToClient(client.getEmail(), "ROLE_USER");
         return client;
     }
 
@@ -52,12 +52,17 @@ public class ClientService implements UserDetailsService {
         log.info("Sauvegarde de nouveau role");
         return rr.save(role);
     }
-    public void addRoleToClient(String email, String roleNom){
+    public Client addRoleToClient(String email, String roleNom){
         log.info("Ajout du role au client");
         Client client = cr.findByEmail(email);
         Role role = rr.findByNom(roleNom);
         client.getRoles().add(role);
+        return client;
 
+    }
+
+    public void deleteAll(){
+        cr.deleteAll();
     }
 
     public List<Client> getClients(){
