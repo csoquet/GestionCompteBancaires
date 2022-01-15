@@ -170,7 +170,7 @@ public class CarteBancaireRepresentation {
     public ResponseEntity<?> updateCarteBancaire(@PathVariable("clientId") String clientId,
                                                  @PathVariable("compteIban") String compteIban,
                                                  @PathVariable("cartebancaireNum") String cartebancaireNum,
-                                                 @RequestBody CarteBancaire cb,
+                                                 @RequestBody CarteBancaireInput cb,
                                                  @AuthenticationPrincipal String clientEmail) {
         Client client = clientR.findById(clientId).get();
         Client clientReel = clientR.findByEmail(clientEmail);
@@ -182,16 +182,14 @@ public class CarteBancaireRepresentation {
         }
         if(client.getEmail().equals(clientEmail) || admin){
             Compte compte = cr.findByClientAndIban(client, compteIban).get();
-            Optional<CarteBancaire> body = Optional.ofNullable(cb);
-            if (!body.isPresent()) {
-                return ResponseEntity.badRequest().build();
-            }
             if (!cbr.existsByNumcarteAndCompte(cartebancaireNum, compte)) {
                 return ResponseEntity.notFound().build();
             }
-            cb.setCompte(compte);
-            cb.setNumcarte(cartebancaireNum);
-            cbr.save(cb);
+            CarteBancaire carte = cbr.findByNumcarteAndCompte(cartebancaireNum, compte).get();
+            carte.setLocalisation(cb.getLocalisation());
+            carte.setPlafond(cb.getPlafond());
+            carte.setSanscontact(cb.getSanscontact());
+            carte.setVirtuelle(cb.getVirtuelle());
             return ResponseEntity.ok().build();
         }
         throw new RuntimeException("Vous ne pouvez pas modifier une carte bancaire qui ne vous appartient pas");
