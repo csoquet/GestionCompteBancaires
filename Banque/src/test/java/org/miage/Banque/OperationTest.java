@@ -28,6 +28,7 @@ import java.util.Date;
 
 import static io.restassured.RestAssured.given;
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -179,9 +180,88 @@ public class OperationTest {
 
         String json2 = response2.asString();
         assertThat(json2, containsString(String.valueOf(solde2+operationInput.getMontant())));
+    }
 
+    @Test
+    public void postOperationCarteBloque() throws ParseException, IOException, JSONException {
+        Role role = new Role("1", "ROLE_USER");
+        clientService.saveRole(role);
+
+        String secret = "0000";
+        Client client1 = new Client("3", "Picard", "Jeremy", "jeremy@test.fr", secret, "08-06-1995", "France", "30RF07125", "0625126321", new ArrayList<>());
+        client1 = clientService.saveClient(client1);
+
+        Double solde1 = 500.0;
+        Compte compte1 = new Compte("FR7612548029989876587210917", solde1, client1);
+        compte1 = compteResource.save(compte1);
+
+        Double solde2 = 300.0;
+        Compte compte2 = new Compte("FR7612548029989876587219817", solde2, client1);
+        compte2 = compteResource.save(compte2);
+
+        CarteBancaire carte1 = new CarteBancaire("1234567891234567", "1234", "123", TRUE, FALSE, 1000.0, FALSE, FALSE, "15-03-2022", FALSE, compte1);
+        carte1 = carteBancaireResource.save(carte1);
+
+        OperationInput operationInput = new OperationInput("Coupe de cheveux", 20.0, 1.0, "Coiffeur", "France", compte2.getIban(), carte1.getNumcarte(), carte1.getCode());
+
+        String access_token = getToken(client1.getEmail(), secret);
+
+        given()
+                .header("Authorization", "Bearer " + access_token)
+                .body(this.toJsonString(operationInput))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/clients/" + client1.getIdclient() + "/comptes/" + compte1.getIban() + "/operations")
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void postPlusieursOperations() throws ParseException, IOException, JSONException {
+        Role role = new Role("1", "ROLE_USER");
+        clientService.saveRole(role);
+
+        String secret = "0000";
+        Client client1 = new Client("3", "Picard", "Jeremy", "jeremy@test.fr", secret, "08-06-1995", "France", "30RF07125", "0625126321", new ArrayList<>());
+        client1 = clientService.saveClient(client1);
+
+        Double solde1 = 500.0;
+        Compte compte1 = new Compte("FR7612548029989876587210917", solde1, client1);
+        compte1 = compteResource.save(compte1);
+
+        Double solde2 = 300.0;
+        Compte compte2 = new Compte("FR7612548029989876587219817", solde2, client1);
+        compte2 = compteResource.save(compte2);
+
+        CarteBancaire carte1 = new CarteBancaire("1234567891234567", "1234", "123", FALSE, FALSE, 1000.0, FALSE, FALSE, "15-03-2022", FALSE, compte1);
+        carte1 = carteBancaireResource.save(carte1);
+
+        OperationInput operationInput = new OperationInput("Coupe de cheveux", 20.0, 1.0, "Coiffeur", "France", compte2.getIban(), carte1.getNumcarte(), carte1.getCode());
+
+        String access_token = getToken(client1.getEmail(), secret);
+
+        given()
+                .header("Authorization", "Bearer " + access_token)
+                .body(this.toJsonString(operationInput))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/clients/" + client1.getIdclient() + "/comptes/" + compte1.getIban() + "/operations")
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
+
+        OperationInput operationInput2 = new OperationInput("Achat médicaments", 15.0, 1.0, "Pharmacie", "France", compte2.getIban(), carte1.getNumcarte(), carte1.getCode());
+
+        given()
+                .header("Authorization", "Bearer " + access_token)
+                .body(this.toJsonString(operationInput2))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/clients/" + client1.getIdclient() + "/comptes/" + compte1.getIban() + "/operations")
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
 
     }
+
 
     private String toJsonString(Object o) throws JsonProcessingException {
         ObjectMapper map = new ObjectMapper();

@@ -141,6 +141,31 @@ public class CarteBancaireTest {
     }
 
     @Test
+    public void postCarteBancaireVirtuelle() throws ParseException, IOException, JSONException {
+        Role role = new Role("1", "ROLE_USER");
+        clientService.saveRole(role);
+
+        String secret = "0000";
+        Client client1 = new Client(UUID.randomUUID().toString(),"Picard","Jeremy", "jeremy@test.fr",secret, "08-06-1995", "France", "30RF07125", "0625126321", new ArrayList<>());
+        client1 = clientService.saveClient(client1);
+
+        Compte compte1 = new Compte("FR7612548029989876587210917", 500.0, client1);
+        compteResource.save(compte1);
+
+        CarteBancaireInput carteBancaireInput = new CarteBancaireInput(TRUE, 100.0, TRUE, TRUE);
+        String access_token = getToken(client1.getEmail(), secret);
+
+        given()
+                .header("Authorization", "Bearer " + access_token)
+                .body(this.toJsonString(carteBancaireInput))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/clients/" + client1.getIdclient() + "/comptes/"+compte1.getIban()+"/cartebancaires")
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
+    }
+
+    @Test
     public void deleteCompte() throws Exception {
         Role role = new Role("1", "ROLE_USER");
         clientService.saveRole(role);
