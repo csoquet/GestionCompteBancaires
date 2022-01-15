@@ -95,6 +95,7 @@ public class ClientTest {
                 .statusCode(HttpStatus.SC_FORBIDDEN);
     }
 
+
     @Test
     public void getAllClientAdmin() throws Exception { //L'admin a le droit de visualiser tous les clients
         Role role = new Role("1", "ROLE_USER");

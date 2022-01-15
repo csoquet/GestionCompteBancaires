@@ -51,11 +51,12 @@ public class BanqueApplication {
 			Role role2 = new Role("2", "ROLE_ADMIN");
 			cs.saveRole(role2);
 
-
 			Client client1 = new Client("1","Dupont","Bruno", "dupont@test.fr","0000", "15-02-1992", "France", "59RF05400", "0625123621", new ArrayList<>());
 			client1 = cs.saveClient(client1);
 			Client client2 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
 			client2 = cs.saveClient(client2);
+
+			client2 = cs.addRoleToClient("papa@test.fr", "ROLE_ADMIN");
 
 			Compte compte1 = new Compte("FR7612548029989876543210917", 500.0, client2);
 			Compte compte2 = new Compte("FR7630003035409876543210925", 200.0, client2);
@@ -66,15 +67,17 @@ public class BanqueApplication {
 
 			CarteBancaire carte1 = new CarteBancaire("1234567891234567", "1234", "123", FALSE, FALSE, 1000.0, TRUE, FALSE,"15-03-2022", FALSE, compte1);
 			CarteBancaire carte2 = new CarteBancaire("1234567891235457", "4321", "321", TRUE, FALSE, 2000.0, FALSE, FALSE,"10-05-2023",FALSE, compte2);
+			CarteBancaire carte3 = new CarteBancaire("1234567891235460", "3412", "652", FALSE, FALSE, 500.0, FALSE, FALSE,"10-08-2022",FALSE, compte3);
 			carteBancaireResource.save(carte1);
 			carteBancaireResource.save(carte2);
+			carteBancaireResource.save(carte3);
 
 			Operation operation1 = new Operation("1",new Date(2022-01-01),"Courses", 20.0, 1.0, "Magasin", "France", compte1,compte2, carte1);
 			Operation operation2 = new Operation ("2",new Date(2020-02-10),"Achat medicaments", 10.0, 0.90, "Pharmacie", "Allemagne",compte2, compte1, carte2);
+			Operation operation3 = new Operation ("3",new Date(2020-05-20),"Achat amazon", 40.0, 1.0, "Internet", "France",compte3, compte2, carte3);
 			operationResource.save(operation1);
 			operationResource.save(operation2);
-
-			client2 = cs.addRoleToClient("papa@test.fr", "ROLE_ADMIN");
+			operationResource.save(operation3);
 
 		};
 	}
