@@ -53,7 +53,6 @@ public class OperationRepresentation {
 
 
     @GetMapping
-    //@PostAuthorize("returnObject.content.client.email == authentication.name or hasRole('ROLE_ADMIN')")
     public CollectionModel<EntityModel<Operation>> getAllOperationByIdCompte(@PathVariable("clientId") String clientId,
                                                                              @PathVariable("compteIban") String compteIban) {
         Client client = clientR.findById(clientId).get();

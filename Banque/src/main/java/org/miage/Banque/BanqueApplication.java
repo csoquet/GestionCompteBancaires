@@ -57,9 +57,6 @@ public class BanqueApplication {
 			Client client2 = new Client("2", "test", "test", "papa@test.fr", "1234", "28-09-1997", "France", "63AL05460","0621513421", new ArrayList<>());
 			client2 = cs.saveClient(client2);
 
-
-
-
 			Compte compte1 = new Compte("FR7612548029989876543210917", 500.0, client2);
 			Compte compte2 = new Compte("FR7630003035409876543210925", 200.0, client2);
 			Compte compte3 = new Compte("FR7630004028379876543210943", 1000.0, client1);

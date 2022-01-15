@@ -41,8 +41,6 @@ public class CompteRepresentation {
 
 
     @GetMapping
-    //@PostAuthorize("returnObject.content.clientId == authentication.name or hasRole('ROLE_ADMIN')")
-    //VOIR HEADER
     public CollectionModel<EntityModel<Compte>> getAllComptesByIdClient(@PathVariable("clientId") String clientId) {
         Optional<Client> client = clientResource.findById(clientId);
         Iterable<Compte> comptes =  cr.findAllByClient(client);
