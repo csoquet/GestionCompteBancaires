@@ -2,7 +2,10 @@ package org.miage.Banque.representation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.miage.Banque.assembler.OperationAssembler;
-import org.miage.Banque.entity.*;
+import org.miage.Banque.entity.CarteBancaire;
+import org.miage.Banque.entity.Client;
+import org.miage.Banque.entity.Compte;
+import org.miage.Banque.entity.Operation;
 import org.miage.Banque.input.OperationInput;
 import org.miage.Banque.resource.CarteBancaireResource;
 import org.miage.Banque.resource.ClientResource;
@@ -14,7 +17,6 @@ import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -80,64 +82,61 @@ public class OperationRepresentation {
     @Transactional
     public ResponseEntity<?> saveOperation(@PathVariable("clientId") String clientId,
                                            @PathVariable("compteIban") String compteIban,
-                                           @RequestBody @Valid OperationInput operation,
-                                           @AuthenticationPrincipal String clientEmail) throws ParseException {
+                                           @RequestBody @Valid OperationInput operation) throws ParseException {
 
         Client client = clientR.getByIdclient(clientId);
-        Client clientReel = clientR.findByEmail(clientEmail);
-        boolean admin = false;
-        for (Role role : clientReel.getRoles()) {
-            if (role.getNom().equals("ROLE_ADMIN")) {
-                admin = true;
-            }
-        }
-        if (client.getEmail().equals(clientEmail) || admin) {
             Compte comptedebiteur = cr.findByClientAndIban(client, compteIban).get();
             Compte comptecrediteur = cr.findByIban(operation.getComptecrediteurIban());
-            CarteBancaire carte = carteResource.findByNumcarteAndCompte(operation.getCarteNumero(), comptedebiteur).get();
+            Optional<CarteBancaire> carte = carteResource.findByNumcarteAndCompte(operation.getCarteNumero(), comptedebiteur);
 
-            /* Partie carte bloqué et carte supprimer */
-            if (carte.getBloque() || carte.getSupprimer()) { //Si la carte est bloquée ou supprimer alors on ne peut pas l'utiliser
-                return ResponseEntity.badRequest().build();
-            }
-
-            /* Partie de vérification du code */
-            if (!carte.getSanscontact()) {
-                if (!carte.getCode().equals(operation.getCodeCarte())) {
+            if(carte.isPresent()){
+                /* Partie carte bloqué et carte supprimer */
+                if (carte.get().getBloque() || carte.get().getSupprimer()) { //Si la carte est bloquée ou supprimer alors on ne peut pas l'utiliser
                     return ResponseEntity.badRequest().build();
                 }
-            }
 
-
-            /* Partie Expiration de la carte*/
-            LocalDate date = LocalDate.now(); //Calcul la date du jour
-            Date dateExpiration = new SimpleDateFormat("dd-MM-yyyy").parse(carte.getExpiration()); //Calcul de la date d'expiration
-            LocalDate dateE = dateExpiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); //Mise en forme de la date d'expiration
-            if (date.isEqual(dateE) || date.isAfter(dateE)) { //Si la date d'expiration est aujourd'hui ou si elle est déjà passé
-                carte.setSupprimer(true); //On supprime la carte
-                return ResponseEntity.badRequest().build(); //Et on renvoie une erreur
-            }
-
-            /* Partie limite de plafond de la carte */
-            LocalDate dateAvant = date.minusDays(30); //On calcule la date 30 jour avant la date d'aujourd'hui
-            List<Operation> operationCarte = or.findAllByCarte(carte); //On récupère toutes les opérations de la carte bancaire
-            Double montantTotal = operation.getMontant();
-            for (Operation o : operationCarte) { //On parcours les opéraitons
-                LocalDate dateOperation = o.getDateheure().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); //On convertis la date dans un format
-                if (dateOperation.isAfter(dateAvant) && dateOperation.isBefore(date)) { //Si l'opération a eu lieu entre aujourd'hui et 30 jours avant
-                    montantTotal += o.getMontant(); //Alors on enregistre le montant
+                /* Partie de vérification du code */
+                if (!carte.get().getSanscontact()) {
+                    if (!carte.get().getCode().equals(operation.getCodeCarte())) {
+                        return ResponseEntity.badRequest().build();
+                    }
                 }
-            }
-            if (montantTotal >= carte.getPlafond()) { //Si le montant total dépasse le plafond
-                return ResponseEntity.badRequest().build(); //Alors on renvoie une erreur
-            }
 
-            /* Partie carte virtuelle utilisé */
-            if (carte.getVirtuelle()) { //Si c'est une carte virtuelle alors elle est supprimer après l'utilisation
-                carte.setSupprimer(true);
+                /* Partie Expiration de la carte*/
+                LocalDate date = LocalDate.now(); //Calcul la date du jour
+                Date dateExpiration = new SimpleDateFormat("dd-MM-yyyy").parse(carte.get().getExpiration()); //Calcul de la date d'expiration
+                LocalDate dateE = dateExpiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); //Mise en forme de la date d'expiration
+                if (date.isEqual(dateE) || date.isAfter(dateE)) { //Si la date d'expiration est aujourd'hui ou si elle est déjà passé
+                    carte.get().setSupprimer(true); //On supprime la carte
+                    return ResponseEntity.badRequest().build(); //Et on renvoie une erreur
+                }
+
+                /* Partie limite de plafond de la carte */
+                LocalDate dateAvant = date.minusDays(30); //On calcule la date 30 jour avant la date d'aujourd'hui
+                List<Operation> operationCarte = or.findAllByCarte(carte.get()); //On récupère toutes les opérations de la carte bancaire
+                Double montantTotal = operation.getMontant();
+                for (Operation o : operationCarte) { //On parcours les opéraitons
+                    LocalDate dateOperation = o.getDateheure().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); //On convertis la date dans un format
+                    if (dateOperation.isAfter(dateAvant) && dateOperation.isBefore(date)) { //Si l'opération a eu lieu entre aujourd'hui et 30 jours avant
+                        montantTotal += o.getMontant(); //Alors on enregistre le montant
+                    }
+                }
+                if (montantTotal >= carte.get().getPlafond()) { //Si le montant total dépasse le plafond
+                    return ResponseEntity.badRequest().build(); //Alors on renvoie une erreur
+                }
+
+                /* Partie carte virtuelle utilisé */
+                if (carte.get().getVirtuelle()) { //Si c'est une carte virtuelle alors elle est supprimer après l'utilisation
+                    carte.get().setSupprimer(true);
+                }
             }
 
             Operation operationSave;
+
+            /* Partie pas de taux appliqué */
+            if(operation.getTauxapplique() == null){
+                operation.setTauxapplique(1.0);
+            }
 
             /* Partie du taux de change */
             Double montant = operation.getMontant();
@@ -151,24 +150,41 @@ public class OperationRepresentation {
            comptedebiteur.setSolde(comptedebiteur.getSolde() - montant); //Sinon on débite le compte débiteur
            comptecrediteur.setSolde(comptecrediteur.getSolde() + montant); //Et on crédite le compte créditeur
 
-           operationSave = new Operation(
-           UUID.randomUUID().toString(),
-                new Timestamp(System.currentTimeMillis()),
-                   operation.getLibelle(),
-                   montant,
-                   operation.getTauxapplique(),
-                   operation.getCategorie(),
-                   operation.getPays(),
-                   comptedebiteur,
-                   comptecrediteur,
-                   carte
+
+
+            if(carte.isPresent()){
+                operationSave = new Operation(
+                        UUID.randomUUID().toString(),
+                        new Timestamp(System.currentTimeMillis()),
+                        operation.getLibelle(),
+                        montant,
+                        operation.getTauxapplique(),
+                        operation.getCategorie(),
+                        operation.getPays(),
+                        comptedebiteur,
+                        comptecrediteur,
+                        carte.get()
                 );
+            }
+            else{
+                operationSave = new Operation(
+                        UUID.randomUUID().toString(),
+                        new Timestamp(System.currentTimeMillis()),
+                        operation.getLibelle(),
+                        montant,
+                        operation.getTauxapplique(),
+                        operation.getCategorie(),
+                        operation.getPays(),
+                        comptedebiteur,
+                        comptecrediteur,
+                        null
+                );
+            }
 
                 Operation saved = or.save(operationSave);
                 URI location = linkTo(methodOn(OperationRepresentation.class).getOneOperation(clientId, compteIban, saved.getIdoperation())).toUri();
                 return ResponseEntity.created(location).build();
-            }
-            throw new RuntimeException("Vous ne pouvez pas créer une opération sur un compte qui ne vous appartient pas");
+
         }
     }
 

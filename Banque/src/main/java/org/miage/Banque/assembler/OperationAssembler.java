@@ -7,7 +7,6 @@ import org.miage.Banque.representation.CompteRepresentation;
 import org.miage.Banque.representation.OperationRepresentation;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
@@ -28,16 +27,14 @@ public class OperationAssembler implements RepresentationModelAssembler<Operatio
         String clientId = operation.getComptedebiteur().getClient().getIdclient();
         String compteId = operation.getComptedebiteur().getIban();
 
-        return EntityModel.of(operation,
-                linkTo(methodOn(OperationRepresentation.class)
-                        .getOneOperation(clientId, compteId, operation.getIdoperation())).withSelfRel(),
-                linkTo(methodOn(OperationRepresentation.class)
-                        .getAllOperationByIdCompte(clientId, compteId)).withRel("collection"),
-                linkTo(methodOn(CompteRepresentation.class)
-                        .getOneCompte(clientId, compteId)).withRel("comptes"),
-                linkTo(methodOn(CarteBancaireRepresentation.class)
-                        .getOneCarteBancaire(clientId, compteId, operation.getCarte().getNumcarte())).withRel("carte")
-        );
+        EntityModel<Operation> entityModel = EntityModel.of(operation);
+        entityModel.add( linkTo(methodOn(OperationRepresentation.class).getOneOperation(clientId, compteId, operation.getIdoperation())).withSelfRel());
+        entityModel.add( linkTo(methodOn(OperationRepresentation.class).getAllOperationByIdCompte(clientId, compteId)).withRel("collection"));
+        entityModel.add(linkTo(methodOn(CompteRepresentation.class).getOneCompte(clientId, compteId)).withRel("comptes"));
+        if(!(operation.getCarte() == null)){
+            entityModel.add(linkTo(methodOn(CarteBancaireRepresentation.class).getOneCarteBancaire(clientId, compteId, operation.getCarte().getNumcarte())).withRel("carte"));
+        }
+        return entityModel;
     }
 
     @SneakyThrows

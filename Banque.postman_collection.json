@@ -1,0 +1,810 @@
+{
+	"info": {
+		"_postman_id": "12fe716f-fe35-4c80-8f91-314dae14c4b6",
+		"name": "Banque",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Requête sans connexion",
+			"item": [
+				{
+					"name": "POST - Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "dupont@test.fr",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "0000",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Inscription client",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nom\": \"bob\",\r\n    \"prenom\":\"bobi\",\r\n    \"email\": \"bobibob@outlook.com\",\r\n    \"secret\":\"4321\",\r\n    \"datenaiss\":\"28-09-1997\",\r\n    \"pays\":\"France\",\r\n    \"nopasseport\":\"62453212\",\r\n    \"numtel\":\"0623451245\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Login Admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "papa@test.fr",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "papa@test.fr",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clients",
+			"item": [
+				{
+					"name": "GET - Allclients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjI1NTYzNX0.EX2Z0W-iRbWVImGAbEyecvZLkScyUNJCvNBPxS0VWq4",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - OneClient",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjExODA4OX0.ZuL0EhSPYw0D8lnnZojmV0QVWIM9oHXs-4ISWvUptFs",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Ajout role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjExODU5Mn0.quYEsLoRIMXbyvXeVavMbpGeQDS2cjXzbAPAUxk2NfM",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nom\": \"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/role",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Ajout role au client",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjExODU5Mn0.quYEsLoRIMXbyvXeVavMbpGeQDS2cjXzbAPAUxk2NfM",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"dupont@test.fr\",\r\n    \"roleNom\": \"ROLE_ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/role/addtoclient",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"role",
+								"addtoclient"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - client",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIxMTg3NTd9.YbuDg9au42mek3IEIonxwrJbMP7M39EQtdPKgoPfIk4",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - client",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIxMTkwNDR9.DC30HtMzt78WSqe4P4q8jmXC5kpP9A7Pc2zyk-RIA1o",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nom\": \"bob\",\r\n    \"prenom\":\"bobi\",\r\n    \"email\": \"dupont@test.fr\",\r\n    \"secret\":\"4321\",\r\n    \"datenaiss\":\"28-09-1997\",\r\n    \"pays\":\"France\",\r\n    \"nopasseport\":\"62453212\",\r\n    \"numtel\":\"0623451245\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comptes",
+			"item": [
+				{
+					"name": "GET - AllComptesByIdClient",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIxOTY4NTl9.C3_zi_Rw-FXBZzjD7O2iggtgH9nzDfFhUsjxFNoQDzA",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - GetOneCompte",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIxMjE3Nzd9.uqIn558Yxy07eo5-GEHI6-1BG8Vf3lZA3eYbOD6mdRM",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Comptes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIxMjA2Mzd9.k9k9GVFzpatV8HIoD1OAu73cv-lkajHdLPTJYpZSoRQ",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"solde\": 200\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Comptes",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIxMjA2Mzd9.k9k9GVFzpatV8HIoD1OAu73cv-lkajHdLPTJYpZSoRQ",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Operations",
+			"item": [
+				{
+					"name": "POST - operations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjE5MzI2N30.oeF4-odDrIgxATxSRAPWk6dForJxs5UjHE9yzLft-Jk",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"libelle\":\"Test123\",\r\n    \"montant\":20.0,\r\n    \"tauxapplique\":1,\r\n    \"pays\":\"France\",\r\n    \"comptecrediteurIban\": \"FR7630003035409876543210925\",\r\n    \"carteNumero\": \"1234567891234567\",\r\n    \"codeCarte\":\"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/2/comptes/FR7612548029989876543210917/operations",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"2",
+								"comptes",
+								"FR7612548029989876543210917",
+								"operations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - AllOperationByIdCompte",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIyNzk3OTJ9.K7_64XnahP8QbhqlPYth9XHzhYeQYI-z-D0g15ZHUEk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943/operations",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943",
+								"operations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - OneOperation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIyNzk3OTJ9.K7_64XnahP8QbhqlPYth9XHzhYeQYI-z-D0g15ZHUEk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943/operations/3",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943",
+								"operations",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CarteBancaire",
+			"item": [
+				{
+					"name": "GET - OneCarteBancaire",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjE5MzgwMH0.SH1ALLFozbT4oGWvVo0QScPEJEkDYs9w7powPeSuh10",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/2/comptes/FR7612548029989876543210917/cartebancaires/1234567891234567",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"2",
+								"comptes",
+								"FR7612548029989876543210917",
+								"cartebancaires",
+								"1234567891234567"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - CarteBancaire",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjE5NDI3NH0.E_a5sfme3LKXlbmnAjjWBB1llHXfJXceLb75WszK94E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"localisation\":true,\r\n    \"plafond\": 200.0,\r\n    \"sanscontact\": false,\r\n    \"virtuelle\":false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943/cartebancaires",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943",
+								"cartebancaires"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - CarteBancaire",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjE5NDU0NX0.fl9Mxr1i5QYZLwYmYnVH0JfqUNB_Bton4roDbM-ZcIk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943/cartebancaires/7764464239556794",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943",
+								"cartebancaires",
+								"7764464239556794"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - AllCarteBancaireByIdCompte",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkdXBvbnRAdGVzdC5mciIsInJvbGVzIjpbIlJPTEVfVVNFUiJdLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwODIvbG9naW4iLCJleHAiOjE2NDIxOTQ0NzZ9.gjxUulNi7Uo4U-bjl_IDhNdz7g_1OYyOAYPGSpte_vU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943/cartebancaires",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943",
+								"cartebancaires"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT - CarteBancaire",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXBhQHRlc3QuZnIiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4Mi9sb2dpbiIsImV4cCI6MTY0MjE5NDU0NX0.fl9Mxr1i5QYZLwYmYnVH0JfqUNB_Bton4roDbM-ZcIk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"localisation\":true,\r\n    \"plafond\": 200.0,\r\n    \"sanscontact\": false,\r\n    \"virtuelle\":false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8082/clients/1/comptes/FR7630004028379876543210943/cartebancaires/5493489664473684",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8082",
+							"path": [
+								"clients",
+								"1",
+								"comptes",
+								"FR7630004028379876543210943",
+								"cartebancaires",
+								"5493489664473684"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
