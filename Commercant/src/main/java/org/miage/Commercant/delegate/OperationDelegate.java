@@ -1,18 +1,17 @@
 package org.miage.Commercant.delegate;
 
+
+import net.minidev.json.JSONObject;
+import org.miage.Commercant.entity.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Date;
 
 @Service
 public class OperationDelegate {
@@ -22,24 +21,30 @@ public class OperationDelegate {
     @Autowired
     RestTemplate restTemplate;
 
-    /*public String callPostOperation(String clientId, String compteId, Operation operation){
+
+    public String callPostOperation(String clientId, String compteId, Operation operation){
 
         HttpHeaders entete = new HttpHeaders();
-        entete.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-        map.add("libelle", operation.getLibelle());
-        map.add("montant", String.valueOf(operation.getMontant()));
-        map.add("tauxapplique", String.valueOf(operation.getTauxapplique()));
-        map.add("categorie", operation.getCategorie());
-        map.add("pays", operation.getPays());
-        map.add("comptecrediteurIban", operation.getComptecrediteurIban());
-        map.add("carteNumero", operation.getCarteNumero());
-        map.add("codeCarte", operation.getCodeCarte());
+        entete.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject objectJson = new JSONObject();
+        objectJson.put("libelle", operation.getLibelle());
+        objectJson.put("montant", operation.getMontant());
+        objectJson.put("tauxapplique", operation.getTauxapplique());
+        objectJson.put("categorie", operation.getCategorie());
+        objectJson.put("pays", operation.getPays());
+        objectJson.put("comptecrediteurIban", operation.getComptecrediteurIban());
+        objectJson.put("carteNumero", operation.getCarteNumero());
+        objectJson.put("codeCarte", operation.getCodeCarte());
 
-        HttpEntity<MultiValueMap<String, String>> requeteHttp = new HttpEntity<MultiValueMap<String, String>>(map, entete);
-
-        String response = restTemplate.exchange("http://banque-service/clients/{clientId}/comptes/{compteId}/operations", HttpMethod.POST, requeteHttp, new ParameterizedTypeReference<String>(){}, clientId, compteId).getBody();
-        System.out.println("Response Received as " + response + " -  " + new Date());
+        HttpEntity<String> request = new HttpEntity<String>(objectJson.toString(), entete);
+        String response = restTemplate.postForObject("http://banque-service/clients/{clientId}/comptes/{compteId}/operations", request, String.class, clientId, compteId);
+        System.out.println("Ajout de l'opération");
         return response;
-    }*/
+    }
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 }
