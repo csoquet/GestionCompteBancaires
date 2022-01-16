@@ -1,4 +1,4 @@
-## Pour commencer, il faut ouvrir docker et lancer la commande suivant dans un cmd : `docker run -p 8500:8500 consul:1.9.13`
+## Pour commencer, il faut ouvrir docker et lancer la commande suivante dans un cmd : `docker run -p 8500:8500 consul:1.9.13`
 
 # Partie Banque
 
